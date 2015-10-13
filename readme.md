@@ -6,17 +6,18 @@ for use with Control Solutions MODBUS products.
 
 ## Installation
 Install nodejs for your platform (http://nodejs.org)
+This will make the `node` and `npm` executables available.
 
-Add the module to your nodejs project
+Create a new folder and navigate there in a command prompt.
+
+Add the MODBUS module to your nodejs project
 `npm install csllc/cs-modbus.git`
 
 If you intend to use a serial-port based MODBUS connection, you need
 `npm install serialport`
 
-
-The examples in ./node_modules/cs-modbus/examples may be helpful.
-
 ## Basic Use
+Create a new file (demo.js) in your project folder and insert the following into it:
 
 ```
 // Include the module
@@ -52,9 +53,26 @@ master.once('connected', function()
   var t1 = master.readDiscreteInputs(0x0000, 8, {
     unit: 1
   });
+
+    // The following hooks the transaction complete event, and prints out the result
+  t1.on('complete', function(err, response)
+  {
+    if (err)
+    {
+      console.error('[Error] %s', err.message);
+    }
+    else
+    {
+      console.log(response);
+    }
+  });
 });
 
 ```
+
+## Examples
+
+[The examples](example) may be helpful.
 
 
 ## License
