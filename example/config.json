@@ -1,0 +1,6 @@
+{
+	"port" : "/dev/cu.usbmodem1D11431",
+	"portoptions" : {
+		"baudrate": 115200
+	}
+}

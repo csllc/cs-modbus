@@ -4,13 +4,16 @@
  */
 'use strict';
 
-
+// Serial port interface
 var SerialPort = require('serialport').SerialPort;
+
+// Modbus interface
 var modbus = require('../lib');
 
-var serialPort = new SerialPort('/dev/cu.usbmodem1d1111', {
-  baudRate: 9600
-});
+// Read config.json file
+var config = require('./config');
+
+var serialPort = new SerialPort(config.port, config.portoptions );
 
 var master = modbus.createMaster({
   transport: {
@@ -31,29 +34,29 @@ var master = modbus.createMaster({
 // Hook all the events so we can see what happens
 master.on('connected', function()
 {
-  console.log('[master#connected]');
+  //console.log('[master#connected]');
 });
 
 master.on('disconnected', function()
 {
-  console.log('[master#disconnected]');
+  //console.log('[master#disconnected]');
 });
 
 master.on('error', function(err)
 {
-  console.error('[master#error] %s', err.message);
+  //console.error('[master#error] %s', err.message);
 });
 
 var connection = master.getConnection();
 
 connection.on('open', function()
 {
-  console.log('[connection#open]');
+  //console.log('[connection#open]');
 });
 
 connection.on('close', function()
 {
-  console.log('[connection#close]');
+  //console.log('[connection#close]');
 });
 
 connection.on('error', function(err)
@@ -63,12 +66,12 @@ connection.on('error', function(err)
 
 connection.on('write', function(data)
 {
-  console.log('[connection#write]', data);
+  //console.log('[connection#write]', data);
 });
 
 connection.on('data', function(data)
 {
-  console.log('[connection#data]', data);
+  //console.log('[connection#data]', data);
 });
 
 var transport = master.getTransport();
@@ -134,7 +137,7 @@ master.once('connected', function()
 
   t1.on('cancel', function()
   {
-    console.log('[transaction#cancel]');
+    //console.log('[transaction#cancel]');
   });
 
   setTimeout(
