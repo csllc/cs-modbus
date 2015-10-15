@@ -37,7 +37,7 @@ describe("WriteFifo8Response", function()
   {
     it("should return a valid function code", function()
     {
-      new WriteFifo8Response(0x0000).getCode().should.be.equal(0x47);
+      new WriteFifo8Response(0x0000).getCode().should.be.equal(0x42);
     });
   });
 
@@ -83,7 +83,7 @@ describe("WriteFifo8Response", function()
 
     it("should read uint8 at 1 as a quantity", function()
     {
-      var frame = new Buffer([0x47, 0x12]);
+      var frame = new Buffer([0x42, 0x12]);
       var req = WriteFifo8Response.fromBuffer(frame);
 
       req.getQuantity().should.be.equal(0x12);
@@ -100,7 +100,7 @@ describe("WriteFifo8Response", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new WriteFifo8Response(0x02).toBuffer()[0].should.be.equal(0x47);
+      new WriteFifo8Response(0x02).toBuffer()[0].should.be.equal(0x42);
     });
 
     it("should write the quantity 1", function()

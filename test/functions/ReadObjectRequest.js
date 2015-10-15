@@ -45,7 +45,7 @@ describe("ReadObjectRequest", function()
   {
     it("should return a valid function code", function()
     {
-      new ReadObjectRequest(0).getCode().should.be.equal(0x48);
+      new ReadObjectRequest(0).getCode().should.be.equal(0x43);
     });
   });
 
@@ -92,7 +92,7 @@ describe("ReadObjectRequest", function()
 
     it("should read uint8 at 1 as an id", function()
     {
-      ReadObjectRequest.fromBuffer(new Buffer([0x48, 0x12])).getId().should.be.equal(0x12);
+      ReadObjectRequest.fromBuffer(new Buffer([0x43, 0x12])).getId().should.be.equal(0x12);
     });
 
   });
@@ -106,7 +106,7 @@ describe("ReadObjectRequest", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new ReadObjectRequest(2).toBuffer()[0].should.be.equal(0x48);
+      new ReadObjectRequest(2).toBuffer()[0].should.be.equal(0x43);
     });
 
     it("should write the id as uint8 at 1", function()
@@ -129,20 +129,20 @@ describe("ReadObjectRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new ReadObjectRequest(2);
-      var res = req.createResponse(new Buffer([0xC8, 0x22]));
+      var res = req.createResponse(new Buffer([0xC3, 0x22]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
-      res.getCode().should.be.equal(0x48);
+      res.getCode().should.be.equal(0x43);
       res.getExceptionCode().should.be.equal(0x22);
     });
 
     it("should return an instance of ReadObjectResponse if the function code is not an exception", function()
     {
       var req = new ReadObjectRequest(2);
-      var res = req.createResponse(new Buffer([0x48, 0x02, 0x01, 0x01]));
+      var res = req.createResponse(new Buffer([0x43, 0x02, 0x01, 0x01]));
 
       res.should.be.an.instanceOf(ReadObjectResponse);
-      res.getCode().should.be.equal(0x48);
+      res.getCode().should.be.equal(0x43);
       res.getCount().should.be.equal(2);
       res.getValues().length.should.be.equal(2);
     });

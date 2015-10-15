@@ -106,7 +106,7 @@ describe("WriteMemoryRequest", function()
   {
     it("should return a valid function code", function()
     {
-      new WriteMemoryRequest(0, 0, 0, [0x00, 0x01]).getCode().should.be.equal(0x4B);
+      new WriteMemoryRequest(0, 0, 0, [0x00, 0x01]).getCode().should.be.equal(0x46);
     });
   });
 
@@ -140,7 +140,7 @@ describe("WriteMemoryRequest", function()
 
       function test2()
       {
-        WriteMemoryRequest.fromBuffer(new Buffer([0x4B, 0x00, 0x01, 0x12, 0x34, 0x01]));
+        WriteMemoryRequest.fromBuffer(new Buffer([0x46, 0x00, 0x01, 0x12, 0x34, 0x01]));
       }
 
       test1.should.throw();
@@ -159,7 +159,7 @@ describe("WriteMemoryRequest", function()
 
     it("should read uint8 at 1 as a type", function()
     {
-      var frame = new Buffer([0x4B, 0x12, 0x34, 0x43, 0x21, 0x01, 0x00]);
+      var frame = new Buffer([0x46, 0x12, 0x34, 0x43, 0x21, 0x01, 0x00]);
       var req = WriteMemoryRequest.fromBuffer(frame);
 
       req.getType().should.be.equal(0x12);
@@ -167,7 +167,7 @@ describe("WriteMemoryRequest", function()
 
     it("should read uint8 at 2 as a page", function()
     {
-      var frame = new Buffer([0x4B, 0x12, 0x34, 0x43, 0x21, 0x01, 0x00]);
+      var frame = new Buffer([0x46, 0x12, 0x34, 0x43, 0x21, 0x01, 0x00]);
       var req = WriteMemoryRequest.fromBuffer(frame);
 
       req.getPage().should.be.equal(0x34);
@@ -175,7 +175,7 @@ describe("WriteMemoryRequest", function()
 
     it("should read uint16 at 3 as an address", function()
     {
-      var frame = new Buffer([0x4B, 0x12, 0x34, 0x43, 0x21, 0x01, 0x00]);
+      var frame = new Buffer([0x46, 0x12, 0x34, 0x43, 0x21, 0x01, 0x00]);
       var req = WriteMemoryRequest.fromBuffer(frame);
 
       req.getAddress().should.be.equal(0x4321);
@@ -183,7 +183,7 @@ describe("WriteMemoryRequest", function()
 
     it("should read uint8 at 5 as a count", function()
     {
-      var frame = new Buffer([0x4B, 0x12, 0x34, 0x43, 0x21, 0x01, 0x00]);
+      var frame = new Buffer([0x46, 0x12, 0x34, 0x43, 0x21, 0x01, 0x00]);
       var req = WriteMemoryRequest.fromBuffer(frame);
 
       req.getCount().should.be.equal(0x1);
@@ -191,7 +191,7 @@ describe("WriteMemoryRequest", function()
 
     it("should read bytes starting at 6 as Buffer of length specified as uint8 at 5", function()
     {
-      var frame = new Buffer([0x4B, 0x12, 0x02, 0x43, 0x21, 0x02, 0x00, 0x02]);
+      var frame = new Buffer([0x46, 0x12, 0x02, 0x43, 0x21, 0x02, 0x00, 0x02]);
       var req = WriteMemoryRequest.fromBuffer(frame);
 
       req.getValues().should.be.eql(new Buffer([0x00, 0x02]));
@@ -207,7 +207,7 @@ describe("WriteMemoryRequest", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new WriteMemoryRequest(0,0,0, new Buffer([0x00, 0x01])).toBuffer()[0].should.be.equal(0x4B);
+      new WriteMemoryRequest(0,0,0, new Buffer([0x00, 0x01])).toBuffer()[0].should.be.equal(0x46);
     });
 
     it("should write the type as uint8 at 1", function()
@@ -243,20 +243,20 @@ describe("WriteMemoryRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new WriteMemoryRequest(0x01,0,0, [0, 1]);
-      var res = req.createResponse(new Buffer([0xCB, 0x02]));
+      var res = req.createResponse(new Buffer([0xC6, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
-      res.getCode().should.be.equal(0x4B);
+      res.getCode().should.be.equal(0x46);
       res.getExceptionCode().should.be.equal(2);
     });
 
     it("should return an instance of WriteMemoryResponse if the function code is not an exception", function()
     {
       var req = new WriteMemoryRequest(0x01,0,0, new Buffer([0x00, 0x01]));
-      var res = req.createResponse(new Buffer([0x4B, 0x01]));
+      var res = req.createResponse(new Buffer([0x46, 0x01]));
 
       res.should.be.an.instanceOf(WriteMemoryResponse);
-      res.getCode().should.be.equal(0x4B);
+      res.getCode().should.be.equal(0x46);
       res.getStatus().should.be.equal(1);
     });
   });

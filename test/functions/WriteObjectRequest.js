@@ -62,7 +62,7 @@ describe("WriteObjectRequest", function()
   {
     it("should return a valid function code", function()
     {
-      new WriteObjectRequest(0, [0x00, 0x01]).getCode().should.be.equal(0x49);
+      new WriteObjectRequest(0, [0x00, 0x01]).getCode().should.be.equal(0x44);
     });
   });
 
@@ -91,7 +91,7 @@ describe("WriteObjectRequest", function()
 
       function test2()
       {
-        WriteObjectRequest.fromBuffer(new Buffer([0x49, 0x00, 0x01]));
+        WriteObjectRequest.fromBuffer(new Buffer([0x44, 0x00, 0x01]));
       }
 
       test1.should.throw();
@@ -110,7 +110,7 @@ describe("WriteObjectRequest", function()
 
     it("should read uint8 at 1 as an id", function()
     {
-      var frame = new Buffer([0x49, 0x12, 0x01, 0x00]);
+      var frame = new Buffer([0x44, 0x12, 0x01, 0x00]);
       var req = WriteObjectRequest.fromBuffer(frame);
 
       req.getId().should.be.equal(0x12);
@@ -118,7 +118,7 @@ describe("WriteObjectRequest", function()
 
     it("should read bytes starting at 3 as Buffer of length specified as uint8 at 2", function()
     {
-      var frame = new Buffer([0x49, 0x12, 0x02, 0x00, 0x02]);
+      var frame = new Buffer([0x44, 0x12, 0x02, 0x00, 0x02]);
       var req = WriteObjectRequest.fromBuffer(frame);
 
       req.getValues().should.be.eql(new Buffer([0x00, 0x02]));
@@ -134,7 +134,7 @@ describe("WriteObjectRequest", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new WriteObjectRequest(0x02, new Buffer([0x00, 0x01])).toBuffer()[0].should.be.equal(0x49);
+      new WriteObjectRequest(0x02, new Buffer([0x00, 0x01])).toBuffer()[0].should.be.equal(0x44);
     });
 
     it("should write the id as uint8 at 1", function()
@@ -170,20 +170,20 @@ describe("WriteObjectRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new WriteObjectRequest(0x01, [0, 1]);
-      var res = req.createResponse(new Buffer([0xC9, 0x02]));
+      var res = req.createResponse(new Buffer([0xC4, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
-      res.getCode().should.be.equal(0x49);
+      res.getCode().should.be.equal(0x44);
       res.getExceptionCode().should.be.equal(2);
     });
 
     it("should return an instance of WriteObjectResponse if the function code is not an exception", function()
     {
       var req = new WriteObjectRequest(0x01, new Buffer([0x00, 0x01]));
-      var res = req.createResponse(new Buffer([0x49, 0x01]));
+      var res = req.createResponse(new Buffer([0x44, 0x01]));
 
       res.should.be.an.instanceOf(WriteObjectResponse);
-      res.getCode().should.be.equal(0x49);
+      res.getCode().should.be.equal(0x44);
       res.getStatus().should.be.equal(1);
     });
   });

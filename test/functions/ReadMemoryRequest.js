@@ -125,7 +125,7 @@ describe("ReadMemoryRequest", function()
   {
     it("should return a valid function code", function()
     {
-      new ReadMemoryRequest().getCode().should.be.equal(0x4A);
+      new ReadMemoryRequest().getCode().should.be.equal(0x45);
     });
   });
 
@@ -178,22 +178,22 @@ describe("ReadMemoryRequest", function()
 
     it("should read uint8 at 1 as a type", function()
     {
-      ReadMemoryRequest.fromBuffer(new Buffer([0x4A, 0x1, 0x12, 0x10, 0x00, 10 ])).getType().should.be.equal(0x1);
+      ReadMemoryRequest.fromBuffer(new Buffer([0x45, 0x1, 0x12, 0x10, 0x00, 10 ])).getType().should.be.equal(0x1);
     });
 
     it("should read uint8 at 2 as a page", function()
     {
-      ReadMemoryRequest.fromBuffer(new Buffer([0x4A, 0x1, 0x12, 0x10, 0x00, 10 ])).getPage().should.be.equal(0x12);
+      ReadMemoryRequest.fromBuffer(new Buffer([0x45, 0x1, 0x12, 0x10, 0x00, 10 ])).getPage().should.be.equal(0x12);
     });
 
     it("should read uint16 at 3 as an address", function()
     {
-      ReadMemoryRequest.fromBuffer(new Buffer([0x4A, 0x1, 0x12, 0x10, 0x00, 10 ])).getAddress().should.be.equal(0x1000);
+      ReadMemoryRequest.fromBuffer(new Buffer([0x45, 0x1, 0x12, 0x10, 0x00, 10 ])).getAddress().should.be.equal(0x1000);
     });
 
     it("should read uint8 at 5 as a count", function()
     {
-      ReadMemoryRequest.fromBuffer(new Buffer([0x4A, 0x1, 0x12, 0x10, 0x00, 10 ])).getCount().should.be.equal(10);
+      ReadMemoryRequest.fromBuffer(new Buffer([0x45, 0x1, 0x12, 0x10, 0x00, 10 ])).getCount().should.be.equal(10);
     });
 
   });
@@ -207,7 +207,7 @@ describe("ReadMemoryRequest", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new ReadMemoryRequest(2).toBuffer()[0].should.be.equal(0x4A);
+      new ReadMemoryRequest(2).toBuffer()[0].should.be.equal(0x45);
     });
 
     it("should write the type as uint8 at 1", function()
@@ -245,20 +245,20 @@ describe("ReadMemoryRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new ReadMemoryRequest(2);
-      var res = req.createResponse(new Buffer([0xCA, 0x22]));
+      var res = req.createResponse(new Buffer([0xC5, 0x22]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
-      res.getCode().should.be.equal(0x4A);
+      res.getCode().should.be.equal(0x45);
       res.getExceptionCode().should.be.equal(0x22);
     });
 
     it("should return an instance of ReadMemoryResponse if the function code is not an exception", function()
     {
       var req = new ReadMemoryRequest(2);
-      var res = req.createResponse(new Buffer([0x4A, 0x03, 0x11, 0x22, 0x33]));
+      var res = req.createResponse(new Buffer([0x45, 0x03, 0x11, 0x22, 0x33]));
 
       res.should.be.an.instanceOf(ReadMemoryResponse);
-      res.getCode().should.be.equal(0x4A);
+      res.getCode().should.be.equal(0x45);
       res.getCount().should.be.equal(3);
       res.getValues().length.should.be.equal(3);
     });

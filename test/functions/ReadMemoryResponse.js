@@ -31,7 +31,7 @@ describe("ReadMemoryResponse", function()
   {
     it("should return a valid function code", function()
     {
-      new ReadMemoryResponse(new Buffer([0x01, 0x04])).getCode().should.be.equal(0x4A);
+      new ReadMemoryResponse(new Buffer([0x01, 0x04])).getCode().should.be.equal(0x45);
     });
   });
 
@@ -78,7 +78,7 @@ describe("ReadMemoryResponse", function()
 
     it("should read N bytes starting at 2 where N is a byte at 1 as a values Buffer", function()
     {
-      ReadMemoryResponse.fromBuffer(new Buffer([0x4A, 0x02, 0x11, 0x22]))
+      ReadMemoryResponse.fromBuffer(new Buffer([0x45, 0x02, 0x11, 0x22]))
         .getValues().should.be.eql(new Buffer([0x11, 0x22]));
     });
   });
@@ -92,7 +92,7 @@ describe("ReadMemoryResponse", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new ReadMemoryResponse(new Buffer([0x04, 0x00])).toBuffer()[0].should.be.equal(0x4A);
+      new ReadMemoryResponse(new Buffer([0x04, 0x00])).toBuffer()[0].should.be.equal(0x45);
     });
 
     it("should write the following byte count as uint8 at 1", function()

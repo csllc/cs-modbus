@@ -31,7 +31,7 @@ describe("ReadObjectResponse", function()
   {
     it("should return a valid function code", function()
     {
-      new ReadObjectResponse(new Buffer([0x01, 0x04])).getCode().should.be.equal(0x48);
+      new ReadObjectResponse(new Buffer([0x01, 0x04])).getCode().should.be.equal(0x43);
     });
   });
 
@@ -78,7 +78,7 @@ describe("ReadObjectResponse", function()
 
     it("should read N bytes starting at 2 where N is a byte at 1 as a values Buffer", function()
     {
-      ReadObjectResponse.fromBuffer(new Buffer([0x48, 0x02, 0x11, 0x22]))
+      ReadObjectResponse.fromBuffer(new Buffer([0x43, 0x02, 0x11, 0x22]))
         .getValues().should.be.eql(new Buffer([0x11, 0x22]));
     });
   });
@@ -92,7 +92,7 @@ describe("ReadObjectResponse", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new ReadObjectResponse(new Buffer([0x04, 0x00])).toBuffer()[0].should.be.equal(0x48);
+      new ReadObjectResponse(new Buffer([0x04, 0x00])).toBuffer()[0].should.be.equal(0x43);
     });
 
     it("should write the following byte count as uint8 at 1", function()

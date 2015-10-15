@@ -62,7 +62,7 @@ describe("WriteFifo8Request", function()
   {
     it("should return a valid function code", function()
     {
-      new WriteFifo8Request(0, [0x00, 0x01]).getCode().should.be.equal(0x47);
+      new WriteFifo8Request(0, [0x00, 0x01]).getCode().should.be.equal(0x42);
     });
   });
 
@@ -91,7 +91,7 @@ describe("WriteFifo8Request", function()
 
       function test2()
       {
-        WriteFifo8Request.fromBuffer(new Buffer([0x47, 0x00, 0x01]));
+        WriteFifo8Request.fromBuffer(new Buffer([0x42, 0x00, 0x01]));
       }
 
       test1.should.throw();
@@ -110,7 +110,7 @@ describe("WriteFifo8Request", function()
 
     it("should read uint8 at 1 as an id", function()
     {
-      var frame = new Buffer([0x47, 0x12, 0x01, 0x00]);
+      var frame = new Buffer([0x42, 0x12, 0x01, 0x00]);
       var req = WriteFifo8Request.fromBuffer(frame);
 
       req.getId().should.be.equal(0x12);
@@ -118,7 +118,7 @@ describe("WriteFifo8Request", function()
 
     it("should read bytes starting at 3 as Buffer of length specified as uint8 at 2", function()
     {
-      var frame = new Buffer([0x47, 0x12, 0x02, 0x00, 0x02]);
+      var frame = new Buffer([0x42, 0x12, 0x02, 0x00, 0x02]);
       var req = WriteFifo8Request.fromBuffer(frame);
 
       req.getValues().should.be.eql(new Buffer([0x00, 0x02]));
@@ -134,7 +134,7 @@ describe("WriteFifo8Request", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new WriteFifo8Request(0x02, new Buffer([0x00, 0x01])).toBuffer()[0].should.be.equal(0x47);
+      new WriteFifo8Request(0x02, new Buffer([0x00, 0x01])).toBuffer()[0].should.be.equal(0x42);
     });
 
     it("should write the id as uint8 at 1", function()
@@ -170,20 +170,20 @@ describe("WriteFifo8Request", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new WriteFifo8Request(0x01, [0, 1]);
-      var res = req.createResponse(new Buffer([0xC7, 0x02]));
+      var res = req.createResponse(new Buffer([0xC2, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
-      res.getCode().should.be.equal(0x47);
+      res.getCode().should.be.equal(0x42);
       res.getExceptionCode().should.be.equal(2);
     });
 
     it("should return an instance of WriteFifo8Response if the function code is not an exception", function()
     {
       var req = new WriteFifo8Request(0x01, new Buffer([0x00, 0x01]));
-      var res = req.createResponse(new Buffer([0x47, 0x01]));
+      var res = req.createResponse(new Buffer([0x42, 0x01]));
 
       res.should.be.an.instanceOf(WriteFifo8Response);
-      res.getCode().should.be.equal(0x47);
+      res.getCode().should.be.equal(0x42);
       res.getQuantity().should.be.equal(1);
     });
   });

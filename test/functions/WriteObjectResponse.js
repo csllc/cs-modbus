@@ -37,7 +37,7 @@ describe("WriteObjectResponse", function()
   {
     it("should return a valid function code", function()
     {
-      new WriteObjectResponse(0x00).getCode().should.be.equal(0x49);
+      new WriteObjectResponse(0x00).getCode().should.be.equal(0x44);
     });
   });
 
@@ -64,7 +64,7 @@ describe("WriteObjectResponse", function()
 
       function test2()
       {
-        WriteObjectResponse.fromBuffer(new Buffer([0x49]));
+        WriteObjectResponse.fromBuffer(new Buffer([0x44]));
       }
 
       test1.should.throw();
@@ -83,7 +83,7 @@ describe("WriteObjectResponse", function()
 
     it("should read uint8 at 1 as a status", function()
     {
-      var frame = new Buffer([0x49, 0x12]);
+      var frame = new Buffer([0x44, 0x12]);
       var req = WriteObjectResponse.fromBuffer(frame);
 
       req.getStatus().should.be.equal(0x12);
@@ -100,7 +100,7 @@ describe("WriteObjectResponse", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new WriteObjectResponse(0x02).toBuffer()[0].should.be.equal(0x49);
+      new WriteObjectResponse(0x02).toBuffer()[0].should.be.equal(0x44);
     });
 
     it("should write the status 1", function()

@@ -65,7 +65,7 @@ describe("ReadFifo8Request", function()
   {
     it("should return a valid function code", function()
     {
-      new ReadFifo8Request(0x00, 2).getCode().should.be.equal(0x46);
+      new ReadFifo8Request(0x00, 2).getCode().should.be.equal(0x41);
     });
   });
 
@@ -123,12 +123,12 @@ describe("ReadFifo8Request", function()
 
     it("should read uint8 at 1 as an id", function()
     {
-      ReadFifo8Request.fromBuffer(new Buffer([0x46, 0x12, 0x34])).getId().should.be.equal(0x12);
+      ReadFifo8Request.fromBuffer(new Buffer([0x41, 0x12, 0x34])).getId().should.be.equal(0x12);
     });
 
     it("should read uint16 at 2 as max", function()
     {
-      ReadFifo8Request.fromBuffer(new Buffer([0x46, 0x12, 0x34])).getMax().should.be.equal(0x34);
+      ReadFifo8Request.fromBuffer(new Buffer([0x41, 0x12, 0x34])).getMax().should.be.equal(0x34);
     });
   });
 
@@ -141,7 +141,7 @@ describe("ReadFifo8Request", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new ReadFifo8Request(0x0002, 3).toBuffer()[0].should.be.equal(0x46);
+      new ReadFifo8Request(0x0002, 3).toBuffer()[0].should.be.equal(0x41);
     });
 
     it("should write the id as uint8 at 1", function()
@@ -168,20 +168,20 @@ describe("ReadFifo8Request", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new ReadFifo8Request(0x0001, 2);
-      var res = req.createResponse(new Buffer([0xC6, 0x02]));
+      var res = req.createResponse(new Buffer([0xC1, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
-      res.getCode().should.be.equal(0x46);
+      res.getCode().should.be.equal(0x41);
       res.getExceptionCode().should.be.equal(2);
     });
 
     it("should return an instance of ReadFifo8Response if the function code is not an exception", function()
     {
       var req = new ReadFifo8Request(0x01, 2);
-      var res = req.createResponse(new Buffer([0x46, 0x02, 0x01, 0x01]));
+      var res = req.createResponse(new Buffer([0x41, 0x02, 0x01, 0x01]));
 
       res.should.be.an.instanceOf(ReadFifo8Response);
-      res.getCode().should.be.equal(0x46);
+      res.getCode().should.be.equal(0x41);
       res.getCount().should.be.equal(1);
       res.getValues().length.should.be.equal(1);
     });

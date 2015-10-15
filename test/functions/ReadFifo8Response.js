@@ -32,7 +32,7 @@ describe("ReadFifo8Response", function()
   {
     it("should return a valid function code", function()
     {
-      new ReadFifo8Response(0x00, new Buffer([0x01, 0x04])).getCode().should.be.equal(0x46);
+      new ReadFifo8Response(0x00, new Buffer([0x01, 0x04])).getCode().should.be.equal(0x41);
     });
   });
 
@@ -81,7 +81,7 @@ describe("ReadFifo8Response", function()
 
     it("should read N bytes starting at 3 where N is a byte at 2 as a values Buffer", function()
     {
-      ReadFifo8Response.fromBuffer(new Buffer([0x46, 0xFF, 0x02, 0x11, 0x22]))
+      ReadFifo8Response.fromBuffer(new Buffer([0x41, 0xFF, 0x02, 0x11, 0x22]))
         .getValues().should.be.eql(new Buffer([0x11, 0x22]));
     });
   });
@@ -95,7 +95,7 @@ describe("ReadFifo8Response", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      new ReadFifo8Response(0, new Buffer([0x46, 0x04, 0x00])).toBuffer()[0].should.be.equal(0x46);
+      new ReadFifo8Response(0, new Buffer([0x41, 0x04, 0x00])).toBuffer()[0].should.be.equal(0x41);
     });
 
     it("should write the status as uint8 at 1", function()
