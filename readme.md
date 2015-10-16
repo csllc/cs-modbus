@@ -74,6 +74,14 @@ master.once('connected', function()
 
 [The examples](example) may be helpful.
 
+In order to run the examples, you should set an environment variable to the name of the serial port that is connected to the MODBUS device.  The method to do this varies by operating system, but as an example, set MODBUS_PORT=COM3 will cause the examples to use COM3.
+
+Alternately, you can edit the examples/config.json file and store the port name there.  Other default configuration settings are stored in config.json as well.
+
+[Ports](example/ports.js) lists all of the serial ports present on the system - which may help identify the correct port to use for the connection.
+
+[Inspect USB](example/inspect-usb.js) is a straightforward approach to opening a serial port connection and querying the device's ID information (ReportSlaveId message).  The various events are hooked to show the progression of a typical message.
+
 
 ## License
 

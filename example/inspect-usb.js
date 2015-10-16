@@ -13,50 +13,50 @@ var modbus = require('../lib');
 // Read config.json file
 var config = require('./config');
 
-var serialPort = new SerialPort(config.port, config.portoptions );
+// use the port specified in the environment, or fall back to config file.
+config.port.name = process.env.MODBUS_PORT || config.port.name;
 
-var master = modbus.createMaster({
-  transport: {
-    type: 'cs-usb',
-    connection: {
-      type: 'serial',
-      serialPort: serialPort
-    }
-  },
-  suppressTransactionErrors: false,
-  retryOnException: false,
-  maxConcurrentRequests: 1,
-  defaultUnit: 1,
-  defaultMaxRetries: 3,
-  defaultTimeout: 100
-});
+var serialPort;
+
+if( config.master.transport.connection.type === 'serial') {
+
+  // Create and open a serial port for the master to use
+  serialPort = new SerialPort(config.port.name, config.port.options );
+
+  config.master.transport.connection.serialPort = serialPort;
+
+}
+
+
+var master = modbus.createMaster(config.master );
+
 
 // Hook all the events so we can see what happens
 master.on('connected', function()
 {
-  //console.log('[master#connected]');
+  console.log('[master#connected]');
 });
 
 master.on('disconnected', function()
 {
-  //console.log('[master#disconnected]');
+  console.log('[master#disconnected]');
 });
 
 master.on('error', function(err)
 {
-  //console.error('[master#error] %s', err.message);
+  console.error('[master#error] %s', err.message);
 });
 
 var connection = master.getConnection();
 
 connection.on('open', function()
 {
-  //console.log('[connection#open]');
+  console.log('[connection#open]');
 });
 
 connection.on('close', function()
 {
-  //console.log('[connection#close]');
+  console.log('[connection#close]');
 });
 
 connection.on('error', function(err)
@@ -66,12 +66,12 @@ connection.on('error', function(err)
 
 connection.on('write', function(data)
 {
-  //console.log('[connection#write]', data);
+  console.log('[connection#write]', data);
 });
 
 connection.on('data', function(data)
 {
-  //console.log('[connection#data]', data);
+  console.log('[connection#data]', data);
 });
 
 var transport = master.getTransport();
@@ -83,18 +83,19 @@ transport.on('request', function(transaction)
 
 master.once('connected', function()
 {
-  var t1 = master.reportSlaveId( {
+  /*var t1 = master.reportSlaveId( {
     unit: 0,
     maxRetries: 3,
     timeout: 100,
     //interval: 100
   });
+  */
 
-  var t2 = master.readFifo8( 0 );
+  var t1 = master.readFifo8( 0, 50 );
 
-  var t3 = master.readMemory( 1, 0, 0, 10 );
+  //var t1 = master.readMemory( 1, 0, 0, 10 );
 
-  var t4 = master.readObject( 0 );
+  //var t1 = master.readObject( 0 );
 
   t1.on('timeout', function()
   {
@@ -102,11 +103,6 @@ master.once('connected', function()
   });
 
   t1.on('error', function(err)
-  {
-    console.error('[transaction#error] %s', err.message);
-  });
-
-  t2.on('error', function(err)
   {
     console.error('[transaction#error] %s', err.message);
   });
@@ -137,7 +133,7 @@ master.once('connected', function()
 
   t1.on('cancel', function()
   {
-    //console.log('[transaction#cancel]');
+    console.log('[transaction#cancel]');
   });
 
   setTimeout(

@@ -1,6 +1,23 @@
 {
-	"port" : "/dev/cu.usbmodem1D11431",
-	"portoptions" : {
-		"baudrate": 115200
+	"port" : {
+		"name" : "/dev/cu.usbmodem1D11431",
+		"options" : {
+			"baudrate": 115200
+		}
+	},
+	"master" : {
+  		"transport": {
+    		"type": "cs-usb",
+    		"connection": {
+      			"type": "serial"
+      		}
+      	},
+  		"suppressTransactionErrors": false,
+  		"retryOnException": false,
+  		"maxConcurrentRequests": 1,
+  		"defaultUnit": 1,
+  		"defaultMaxRetries": 1,
+  		"defaultTimeout": 1000
 	}
+
 }
