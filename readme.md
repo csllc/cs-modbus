@@ -82,6 +82,9 @@ Alternately, you can edit the examples/config.json file and store the port name 
 
 [Inspect USB](example/inspect-usb.js) is a straightforward approach to opening a serial port connection and querying the device's ID information (ReportSlaveId message).  The various events are hooked to show the progression of a typical message.
 
+## Development
+Units tests are provided which include code coverage reports:
+`npm test`
 
 ## License
 
