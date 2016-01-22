@@ -41,12 +41,13 @@ describe("ReadFifo8Response", function()
     it("should create an instance from the specified options object", function()
     {
       var res = ReadFifo8Response.fromOptions({
-        status: 0x01,
+        status: {more: true},
         values: new Buffer([0xFF, 0xFF])
       });
 
       res.getValues().should.be.eql(new Buffer([0xFF, 0xFF]));
-      res.getStatus().should.be.eql(0x01);
+      //res.getStatus().should.be.an('object');
+      res.getStatus().more.should.be.eql(true);
     });
 
   });
@@ -100,7 +101,7 @@ describe("ReadFifo8Response", function()
 
     it("should write the status as uint8 at 1", function()
     {
-      new ReadFifo8Response(4, new Buffer(0)).toBuffer()[1].should.be.equal(4);
+      new ReadFifo8Response({more: true, overflow: true}, new Buffer(0)).toBuffer()[1].should.be.equal(3);
     });
 
     it("should write the following byte count as uint8 at 2", function()
@@ -123,7 +124,8 @@ describe("ReadFifo8Response", function()
   {
     it("should return a string", function()
     {
-      new ReadFifo8Response(0, new Buffer([0x11, 0x22, 0x33])).toString().should.be.a('string');
+      new ReadFifo8Response({more:true,overflow:true}, new Buffer([0x11, 0x22, 0x33])).toString().should.be.a('string');
+      new ReadFifo8Response({more:false,overflow:false}, new Buffer([0x11, 0x22, 0x33])).toString().should.be.a('string');
     });
   });
 

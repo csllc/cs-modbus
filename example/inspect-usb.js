@@ -91,11 +91,15 @@ master.once('connected', function()
   });
   */
 
-  var t1 = master.readFifo8( 0, 50 );
+  //var t1 = master.readFifo8( 0, 50 );
 
   //var t1 = master.readMemory( 1, 0, 0, 10 );
 
-  //var t1 = master.readObject( 0 );
+  var t1 = master.readObject( 3, {
+    onComplete: function(err, response ) {
+      console.log( err, response );
+    }
+  } );
 
   t1.on('timeout', function()
   {
