@@ -47,8 +47,20 @@ describe("ReadFifo8Request", function()
       new ReadFifo8Request(0, 251);
     }
 
+    function testUndefined()
+    {
+      new ReadFifo8Request(0);
+    }
+
+    function testZero()
+    {
+      new ReadFifo8Request(0);
+    }
+
     testLessThanZero1.should.throw();
     testGreaterThanMax.should.throw();
+    testUndefined.should.not.throw();
+    testZero.should.not.throw();
   });
 
   it("should use 0x00 as a default id", function()
