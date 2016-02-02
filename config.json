@@ -1,20 +1,24 @@
 {
 	"port" : {
-		"name" : "/dev/cu.usbmodem1D11441",
+		"name" : "/dev/cu.usbserial30",
 		"options" : {
-			"baudrate": 115200
+			"baudrate": 19200,
+      "rts": false,
+      "dtr" : false
 		}
 	},
 	"master" : {
   		"transport": {
-    		"type": "cs-usb",
+    		"type": "rtu",
+        "eofTimeout": 20,
+        "slaveId" : 127,
     		"connection": {
       			"type": "serial"
       		}
       	},
-  		"suppressTransactionErrors": false,
+  		"suppressTransactionErrors": true,
   		"retryOnException": false,
-  		"maxConcurrentRequests": 1,
+  		"maxConcurrentRequests": 2,
   		"defaultUnit": 1,
   		"defaultMaxRetries": 1,
   		"defaultTimeout": 1000

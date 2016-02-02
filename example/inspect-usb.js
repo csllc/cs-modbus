@@ -11,7 +11,7 @@ var SerialPort = require('serialport').SerialPort;
 var modbus = require('../lib');
 
 // Read config.json file
-var config = require('./config');
+var config = require('../config');
 
 // use the port specified in the environment, or fall back to config file.
 config.port.name = process.env.MODBUS_PORT || config.port.name;
