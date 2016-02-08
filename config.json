@@ -1,6 +1,7 @@
 {
 	"port" : {
-		"name" : "/dev/cu.usbserial30",
+    "name2" : "/dev/cu.usbserial-FTYXTE2T",
+		"name" : "/dev/cu.usbserial32",
 		"options" : {
 			"baudrate": 19200,
       "rts": false,

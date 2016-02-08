@@ -74,6 +74,7 @@ var type;
 
 if( ['read', 'write'].indexOf( action ) < 0 ) {
   console.error(chalk.red( 'Unknown Action ' + action + ' Requested'));
+  exit(1);
 }
 
 
@@ -224,7 +225,7 @@ master.once( 'connected', function () {
 
       break;
 
-    case 'set':
+    case 'write':
       // Validate what we are supposed to set
       var type = args._[1] || 'unknown';
 
@@ -237,7 +238,7 @@ master.once( 'connected', function () {
 
         case 'holding':
           var address = args._[2] || 0;
-          var value = args._[3] || 1;
+          var value = args._[3];
           master.writeSingleRegister( address, value, output );
           break;
 
@@ -271,6 +272,7 @@ master.once( 'connected', function () {
 
     default:
       console.error( chalk.red('Unknown action: ' + action ));
+      exit(1);
       break;
   }
 
