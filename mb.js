@@ -38,7 +38,11 @@ var winston = require('winston');
 var ModbusPort = require('./lib/index');
 
 // use environment variable for port name if specified
-config.port.name = process.env.MODBUS_PORT || config.port.name;
+config.port.name = args.port || process.env.MODBUS_PORT || config.port.name;
+
+// override slave id if necessary
+config.master.defaultUnit = args.slave || process.env.MODBUS_SLAVE || config.master.defaultUnit;
+
 
 if( args.h || args._.length < 2 ) {
   console.info( '\r--------MODBUS Utility: ' + config.port.name + '----------');
@@ -46,8 +50,9 @@ if( args.h || args._.length < 2 ) {
   console.info( 'See config.json for connection configuration.\r');
   console.info( '\rCommand format:\r');
   console.info( path.basename(__filename, '.js') + '[-h -v] action [type] [...]\r');
-  console.info( '    action: read/write\r');
-  console.info( '    type: what sort of item\r');
+  console.info( '    action: read/write/command\r');
+  console.info( '    type: identifies what to read/write/command\r');
+  console.info( '\r    Read types:\r');
   console.info( chalk.bold('        coil') + ' [start] [quantity]' );
   console.info( chalk.bold('        discrete') + ' [start] [quantity]');
   console.info( chalk.bold('        holding') + ' [start] [quantity]');
@@ -56,9 +61,22 @@ if( args.h || args._.length < 2 ) {
   console.info( chalk.bold('        fifo') + ' [id] [max]');
   console.info( chalk.bold('        object') + ' [id]');
   console.info( chalk.bold('        memory') + ' [type] [page] [address] [length]');
+
+  console.info( '\r    Write types:\r');
+  console.info( chalk.bold('        coil') + ' [start] [quantity] value1 value2...' );
+  console.info( chalk.bold('        holding') + ' [start] [quantity] value1 value2...');
+  console.info( chalk.bold('        fifo') + ' [id] value1 value2...');
+  console.info( chalk.bold('        object') + ' [id] value1 value2...');
+  console.info( chalk.bold('        memory') + ' [type] [page] [address] value1 value2...');
+
+  console.info( '\r    Command types:\r');
+  console.info( chalk.bold('        [id]') + ' [value1] [value2] ...' );
+
   console.info( chalk.underline( '\rOptions\r'));
   console.info( '    -h          This help output\r');
   console.info( '    -v          Verbose output (for debugging)\r');
+  console.info( '    --port      Specify serial port to use\r');
+  console.info( '    --slave     Specify MODBUS slave ID to communicate with\r');
   console.info( chalk.underline( '\rResult\r'));
   console.info( 'Return value is 0 if successful\r');
   console.info( 'Output may be directed to a file\r');
@@ -67,12 +85,11 @@ if( args.h || args._.length < 2 ) {
   process.exit(0);
 }
 
-//console.log(args);
 // Check the action argument for validity
 var action = args._[0];
 var type;
 
-if( ['read', 'write'].indexOf( action ) < 0 ) {
+if( ['read', 'write', 'command'].indexOf( action ) < 0 ) {
   console.error(chalk.red( 'Unknown Action ' + action + ' Requested'));
   exit(1);
 }
@@ -147,6 +164,26 @@ function output( err, response ) {
   }
 }
 
+function argsToBuf( args, start )
+{
+  //if( start > args.length ) {
+  //  return new Buffer(0);
+ // }
+
+  var values = [];
+
+  for( var i = start; i< args.length; i++ ) {
+    var number = parseInt(args[i]);
+    if( number < 0 || number > 255 ) {
+      console.error( chalk.red('Invalid data value: ' + args[i] ));
+        exit(1);
+    }
+    values.push(number);
+  }
+
+  return new Buffer(values);
+
+}
 
 // Open the serial port we are going to use
 var port = new serialPortFactory.SerialPort( config.port.name, config.port.options, false );
@@ -270,6 +307,19 @@ master.once( 'connected', function () {
 
       break;
 
+    case 'command':
+    {
+      // Validate what we are supposed to set
+      if( args.length < 2 ) {
+          console.error( chalk.red('Trying to write unknown item ' + type ));
+          exit(1);
+      }
+      var buf = argsToBuf( args._, 2 );
+
+      master.command( args._[1], buf );
+      break;
+    }
+
     default:
       console.error( chalk.red('Unknown action: ' + action ));
       exit(1);
@@ -337,7 +387,7 @@ transport.on('request', function(transaction)
   {
     if (response.isException())
     {
-      transLog.error('[response] %s', response);
+      transLog.error('[response] ', response.toString());
     }
     else
     {
@@ -349,12 +399,13 @@ transport.on('request', function(transaction)
   {
     if (err)
     {
-      transLog.error('[complete] %s', err.message);
+      transLog.error('[complete] ', err.message);
     }
     else
     {
       transLog.info('[complete] %s', response);
     }
+    exit(0);
   });
 
   transaction.once('cancel', function()
@@ -377,6 +428,7 @@ if( args.v ) {
 port.open(function(err) {
   if( err ) {
     console.log(err);
+    exit(1);
   }
 });
 
