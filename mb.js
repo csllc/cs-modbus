@@ -316,7 +316,7 @@ master.once( 'connected', function () {
       }
       var buf = argsToBuf( args._, 2 );
 
-      master.command( args._[1], buf );
+      master.command( args._[1], buf, output );
       break;
     }
 
