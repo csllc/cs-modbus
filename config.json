@@ -21,7 +21,7 @@
   		"retryOnException": false,
   		"maxConcurrentRequests": 2,
   		"defaultUnit": 1,
-  		"defaultMaxRetries": 1,
+  		"defaultMaxRetries": 0,
   		"defaultTimeout": 1000
 	}
 

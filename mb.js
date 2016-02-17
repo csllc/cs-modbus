@@ -37,6 +37,9 @@ var winston = require('winston');
 // Load the object that handles communication to the device
 var ModbusPort = require('./lib/index');
 
+// Buffer utilities
+var buffers = require('h5.buffers');
+
 // use environment variable for port name if specified
 config.port.name = args.port || process.env.MODBUS_PORT || config.port.name;
 
@@ -164,7 +167,7 @@ function output( err, response ) {
   }
 }
 
-function argsToBuf( args, start )
+function argsToByteBuf( args, start )
 {
   //if( start > args.length ) {
   //  return new Buffer(0);
@@ -173,7 +176,15 @@ function argsToBuf( args, start )
   var values = [];
 
   for( var i = start; i< args.length; i++ ) {
-    var number = parseInt(args[i]);
+    var number;
+
+    if( args[i].toString().substring(0,1) === '0x') {
+      number = parseInt(args[i].substring(2), 16);
+    }
+    else {
+      number = parseInt(args[i]);
+    }
+
     if( number < 0 || number > 255 ) {
       console.error( chalk.red('Invalid data value: ' + args[i] ));
         exit(1);
@@ -182,6 +193,31 @@ function argsToBuf( args, start )
   }
 
   return new Buffer(values);
+
+}
+
+function argsToWordBuf( args, start )
+{
+  var builder = new buffers.BufferBuilder();
+
+  for( var i = start; i< args.length; i++ ) {
+    var number;
+
+    if( args[i].toString().substring(0,1) === '0x') {
+      number = parseInt(args[i].substring(2), 16);
+    }
+    else {
+      number = parseInt(args[i]);
+    }
+
+    if( number < 0 || number > 65535 ) {
+      console.error( chalk.red('Invalid data value: ' + args[i] ));
+        exit(1);
+    }
+    builder.pushUInt16( number );
+  }
+
+  return builder.toBuffer();
 
 }
 
@@ -275,8 +311,15 @@ master.once( 'connected', function () {
 
         case 'holding':
           var address = args._[2] || 0;
-          var value = args._[3];
-          master.writeSingleRegister( address, value, output );
+          var values = argsToWordBuf( args._, 3 );
+
+          if( values.length < 2 ){
+            console.error( chalk.red('No values specified ' ));
+            exit(1);
+          }
+          else {
+            master.writeMultipleRegisters( address, values, output );
+          }
           break;
 
         case 'fifo':
@@ -314,7 +357,7 @@ master.once( 'connected', function () {
           console.error( chalk.red('Trying to write unknown item ' + type ));
           exit(1);
       }
-      var buf = argsToBuf( args._, 2 );
+      var buf = argsToByteBuf( args._, 2 );
 
       master.command( args._[1], buf, output );
       break;
