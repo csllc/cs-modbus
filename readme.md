@@ -62,8 +62,6 @@ The "port" object is used to configure a serial port connection.  It has the fol
 - _dataBits:_ Data Bits, defaults to 8. Must be one of: 8, 7, 6, or 5.
 - _stopBits:_ Stop Bits, defaults to 1. Must be one of: 1 or 2.
 - _parity:_ Parity, defaults to 'none'. Must be one of: 'none', 'even', 'mark', 'odd', 'space'
-- _rts:_ the initial state of the RTS line when the port is open
-- _dtr:_ the initial state of the DTR line when the port is open
 
 The "master" object controls the behavior of the MODBUS master.  It has the following options:
 * _transport:_ Determines how messages will be framed and encoded for transport over the connection.  _rtu_ for (standard) MODBUS RTU, _ascii_ for (standard) MODBUS ASCII, _ip_ for (standard) MODBUS TCP/IP, and _tunnel_ for (Control Solutions proprietary) tunneling of MODBUS commands over an RTU-based network.  Using _tunnel_ allows cs-modbus to act like a master, even as it participates on the physical network as a slave.  This setting requires the 'real' MODBUS master to implement SLAVE_COMMAND polling, as defined in CS document *DOC0003824A-SRS-A*
@@ -84,8 +82,8 @@ The "master" object controls the behavior of the MODBUS master.  It has the foll
 ### mb Utility
 The mb utility allows simple MODBUS interactions with an attached slave.  After configuring the connection, run the mb utility.
 `node mb -h` shows the available command line options
-`node mb read register 0 3` reads three registers starting at address 0 
-`node mb read register 0 3 -v` reads the same three registers and outputs verbose diagnostic information, including the exact bytes transmitted and received over the link. 
+`node mb read holding 0 3` reads three registers starting at address 0 
+`node mb read holding 0 3 -v` reads the same three registers and outputs verbose diagnostic information, including the exact bytes transmitted and received over the link. 
 
 ## Using cs-modbus to build an application
 

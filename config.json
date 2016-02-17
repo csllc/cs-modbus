@@ -3,9 +3,7 @@
     "name2" : "/dev/cu.usbserial-FTYXTE2T",
 		"name" : "/dev/cu.usbserial",
 		"options" : {
-			"baudrate": 19200,
-      "rts": false,
-      "dtr" : false
+			"baudrate": 19200
 		}
 	},
 	"master" : {
