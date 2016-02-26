@@ -9,7 +9,7 @@
 	"master" : {
   		"transport": {
     		"type": "rtu",
-        "eofTimeout": 20,
+        "eofTimeout": 100,
         "slaveId" : 127,
     		"connection": {
       			"type": "serial"

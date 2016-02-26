@@ -45,10 +45,12 @@ if( args.h ) {
 // Retrieve a list of all the ports on the machine
 serialPortFactory.list(function (err, ports) {
 
+ports = ports.slice(-2);
+console.log(ports);
   var numPorts = ports.length;
 
   ports.forEach(function(port) {
-
+console.log('opening ' + port.comName, config.port.options );
     var serialport = new serialPortFactory.SerialPort( port.comName, config.port.options, false);
 
     // Make serial port available for the modbus master
@@ -57,6 +59,7 @@ serialPortFactory.list(function (err, ports) {
     // Create the MODBUS master
     var master = ModbusPort.createMaster( config.master );
 
+    try{
     serialport.open( function(error) {
       if( error ) {
         console.error( chalk.bold(port.comName) + ': Unable to open(' + error + ')');
@@ -66,7 +69,11 @@ serialPortFactory.list(function (err, ports) {
         }
       }
     });
-
+}
+catch( e ) {
+  console.log( 'caught ' + e);
+  numPorts--;
+}
     // When the master is connected...
     master.once( 'connected', function () {
 
