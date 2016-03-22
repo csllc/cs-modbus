@@ -27,15 +27,19 @@
     "node ~0.10.5"
   ],
   "main": "./lib/index",
-  "dependencies": {
-    "h5.buffers": "~0.1.1"
-  },
   "bin": {
     "mb": "mb.js"
   },
+  "dependencies": {
+    "h5.buffers": "~0.1.1"
+    "chalk": "^1.1.1",
+    "minimist": "^1.2.0",
+    "serialport": "^2.0.6",
+    "socket.io-client": "^1.4.5",
+    "winston": "^2.1.1"
+  },
   "devDependencies": {
     "chai": "^3.5.0",
-    "chalk": "^1.1.1",
     "grunt": "~0.4.1",
     "grunt-cli": "~0.1.7",
     "grunt-contrib-clean": "~0.4.1",
@@ -43,12 +47,8 @@
     "grunt-env": "~0.4.0",
     "grunt-istanbul": "~0.2.1",
     "grunt-simple-mocha": "~0.4.0",
-    "minimist": "^1.2.0",
-    "serialport": "^2.0.6",
     "should": "~1.2.2",
-    "sinon": "~1.7.2",
-    "socket.io-client": "^1.4.5",
-    "winston": "^2.1.1"
+    "sinon": "~1.7.2"
   },
   "scripts": {
     "test": "grunt --force"
