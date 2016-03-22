@@ -4,8 +4,8 @@
  *
  * Run the demo from the command line.  The port settings in the config.json
  * file will be used to connect to the ACN device and execute the command.
- * If defined, the MODBUS_PORT environment variable will override the port identified
- * in the config.json file.
+ * If defined, the MODBUS_PORT environment variable will override the
+ * port identified in the config.json file.
  *
  */
 'use strict';
@@ -44,7 +44,14 @@ var buffers = require('h5.buffers');
 config.port.name = args.port || process.env.MODBUS_PORT || config.port.name;
 
 // override slave id if necessary
-config.master.defaultUnit = args.slave || process.env.MODBUS_SLAVE || config.master.defaultUnit;
+config.master.defaultUnit = args.slave ||
+  process.env.MODBUS_SLAVE ||
+  config.master.defaultUnit;
+
+// override slave id if necessary
+config.port.options.baudrate = args.baudrate ||
+  process.env.MODBUS_BAUDRATE ||
+  config.port.options.baudrate;
 
 
 
@@ -79,33 +86,6 @@ function output( err, response ) {
   }
 }
 
-/**
- * Parses a string into a number with bounds check
- *
- * String can be decimal, or if it starts with 0x
- * it is interpreted as hex
- *
- * @param  {[string]} s       string to parse
- * @param  {[number]} default if string can't be parsed
- * @return {[number]}         the parsed number or the default
- */
-function parseNumber( s, def )
-{
-  var number;
-
-  if( 'undefined' === typeof( s )) {
-    return def;
-  }
-
-  if( s.toString().substring(0,1) === '0x') {
-    number = parseInt(s.substring(2), 16);
-  }
-  else {
-    number = parseInt(s);
-  }
-  return number;
-
-}
 
 /**
  * Convert an array of args to an array of numbers
@@ -180,7 +160,8 @@ if( args.h  ) {
   console.info( 'Reads or writes from an MODBUS device\r');
   console.info( 'See config.json for connection configuration.\r');
   console.info( '\rCommand format:\r');
-  console.info( path.basename(__filename, '.js') + '[-h -v] action [type] [...]\r');
+  console.info( path.basename(__filename, '.js') +
+    '[-h -v] action [type] [...]\r');
   console.info( '    action: read/write/command\r');
   console.info( '    type: identifies what to read/write/command\r');
   console.info( '\r    Read types:\r');
@@ -191,14 +172,18 @@ if( args.h  ) {
   console.info( chalk.bold('        slave'));
   console.info( chalk.bold('        fifo') + ' [id] [max]');
   console.info( chalk.bold('        object') + ' [id]');
-  console.info( chalk.bold('        memory') + ' [type] [page] [address] [length]');
+  console.info( chalk.bold('        memory') +
+    ' [type] [page] [address] [length]');
 
   console.info( '\r    Write types:\r');
-  console.info( chalk.bold('        coil') + ' [start] [quantity] value1 value2...' );
-  console.info( chalk.bold('        holding') + ' [start] [quantity] value1 value2...');
+  console.info( chalk.bold('        coil') +
+    ' [start] [quantity] value1 value2...' );
+  console.info( chalk.bold('        holding') +
+   ' [start] [quantity] value1 value2...');
   console.info( chalk.bold('        fifo') + ' [id] value1 value2...');
   console.info( chalk.bold('        object') + ' [id] value1 value2...');
-  console.info( chalk.bold('        memory') + ' [type] [page] [address] value1 value2...');
+  console.info( chalk.bold('        memory') +
+    ' [type] [page] [address] value1 value2...');
 
   console.info( '\r    Command types:\r');
   console.info( chalk.bold('        [id]') + ' [value1] [value2] ...' );
@@ -208,14 +193,17 @@ if( args.h  ) {
   console.info( '    -l          List all ports on the system\r');
   console.info( '    -v          Verbose output (for debugging)\r');
   console.info( '    --port      Specify serial port to use\r');
-  console.info( '    --slave     Specify MODBUS slave ID to communicate with\r');
+  console.info( '    --slave     ' +
+    'Specify MODBUS slave ID to communicate with\r');
   console.info( chalk.underline( '\rResult\r'));
   console.info( 'Return value is 0 if successful\r');
   console.info( 'Output may be directed to a file\r');
-  console.info( '    e.g. ' + chalk.dim('mb read object 1 >> myConfig.json') + '\r');
-  console.info( chalk.underline( '\Examples\r'));
-  console.info( 'mb read holding 0 3  (read 3 registers from 0)\r');
-  console.info( 'mb write holding 0 0x100 32 23  (writes register 0, 1, and 2)\r');
+  console.info( '    e.g. ' +
+    chalk.dim('mb read object 1 >> myConfig.json') + '\r');
+  console.info( chalk.underline( 'Examples\r'));
+  console.info( 'mb read holding 0 3 (read 3 registers from 0)\r');
+  console.info( 'mb write holding 0 0x100 32 23  ' +
+    '(writes register 0, 1, and 2)\r');
   console.info( 'mb read slave  (retrieve device info)\r');
 
   process.exit(0);
@@ -250,11 +238,8 @@ if( args.l ) {
 }
 else {
 
-
-
   // Check the action argument for validity
   var action = args._[0];
-  var type;
 
   if( ['read', 'write', 'command'].indexOf( action ) < 0 ) {
     console.error(chalk.red( 'Unknown Action ' + action + ' Requested'));
@@ -301,12 +286,72 @@ else {
     transLog.add(winston.transports.File, { filename: args.log });
   }
 
+  var port;
 
-  // Open the serial port we are going to use
-  var port = new serialPortFactory.SerialPort( config.port.name, config.port.options, false );
+  if( config.master.transport.connection.type === 'serial') {
 
-  // Make serial port available for the modbus master
-  config.master.transport.connection.serialPort = port;
+    // Open the serial port we are going to use
+    port = new serialPortFactory.SerialPort(
+      config.port.name,
+      config.port.options,
+      false );
+
+    // Make serial port instance available for the modbus master
+    config.master.transport.connection.serialPort = port;
+
+    // Open the port
+    // the 'open' event is triggered when complete
+    if( args.v ) {
+      serialLog.info( 'Opening ' + config.port.name );
+    }
+
+    port.open(function(err) {
+      if( err ) {
+        console.log(err);
+        exit(1);
+      }
+    });
+  }
+  else if( config.master.transport.connection.type === 'websocket') {
+    port = require('socket.io-client')(config.websocket.url, config.websocket);
+
+    // Make socket instance available for the modbus master
+    config.master.transport.connection.socket = port;
+
+    port.on('connect_error', function(err){
+      serialLog.info( '[connection#connect_error]');
+    });
+
+    port.on('connect_timeout', function(){
+      serialLog.info( '[connection#connect_timeout]');
+    });
+
+    port.on('reconnect', function(attempt){
+      serialLog.info( '[connection#reconnect] ', attempt);
+    });
+
+    port.on('reconnecting', function(attempt){
+      serialLog.info( '[connection#reconnecting] ', attempt);
+    });
+
+    port.on('reconnect_error', function(err){
+      serialLog.info( '[connection#reconnect_error] ');
+    });
+
+    port.on('reconnect_failed', function(){
+      serialLog.info( '[connection#reconnect_failed] ');
+    });
+
+    port.on('ping', function(){
+      serialLog.info( '[connection#ping] ');
+    });
+
+    port.on('pong', function(ms){
+      serialLog.info( '[connection#pong] ', ms);
+    });
+
+  }
+
 
   // Create the MODBUS master
   var master = ModbusPort.createMaster( config.master );
@@ -314,6 +359,12 @@ else {
 
   // Attach event handler for the port opening
   master.once( 'connected', function () {
+
+    var address;
+    var quantity;
+    var id;
+    var max;
+    var value;
 
     // Now do the action that was requested
     switch( action ) {
@@ -325,26 +376,26 @@ else {
         switch( type ) {
 
           case 'coil':
-            var address = args._[2] || 0;
-            var quantity = args._[3] || 1;
+            address = args._[2] || 0;
+            quantity = args._[3] || 1;
             master.readCoils( address, quantity, output );
             break;
 
           case 'discrete':
-            var address = args._[2] || 0;
-            var quantity = args._[3] || 1;
+            address = args._[2] || 0;
+            quantity = args._[3] || 1;
             master.readDiscreteInputs( address, quantity, output );
             break;
 
           case 'holding':
-            var address = args._[2] || 0;
-            var quantity = args._[3] || 1;
+            address = args._[2] || 0;
+            quantity = args._[3] || 1;
             master.readHoldingRegisters( address, quantity, output );
             break;
 
           case 'input':
-            var address = args._[2] || 0;
-            var quantity = args._[3] || 1;
+            address = args._[2] || 0;
+            quantity = args._[3] || 1;
             master.readInputRegisters( address, quantity, output );
             break;
 
@@ -353,20 +404,20 @@ else {
             break;
 
           case 'fifo':
-            var id = args._[2] || 0;
-            var max = args._[3] || 250;
+            id = args._[2] || 0;
+            max = args._[3] || 250;
             master.readFifo8( id, max, output );
             break;
 
           case 'object':
-            var id = args._[2] || 0;
+            id = args._[2] || 0;
             master.readObject( id, output );
             break;
 
           case 'memory':
-            var type = args._[2] || 0;
+            type = args._[2] || 0;
             var page = args._[3] || 0;
-            var address = args._[4] || 0;
+            address = args._[4] || 0;
             var length = args._[5] || 250;
             master.readMemory( type, page, address, length, output );
             break;
@@ -381,17 +432,17 @@ else {
 
       case 'write':
         // Validate what we are supposed to set
-        var type = args._[1] || 'unknown';
+        type = args._[1] || 'unknown';
 
         switch( type ) {
           case 'coil':
-            var address = args._[2] || 0;
-            var value = args._[3] || 1;
+            address = args._[2] || 0;
+            value = args._[3] || 1;
             master.writeSingleCoil( address, value, output );
             break;
 
           case 'holding':
-            var address = args._[2] || 0;
+            address = args._[2] || 0;
             var values = argsToWordBuf( args._, 3 );
 
             if( values.length < 2 ){
@@ -404,8 +455,8 @@ else {
             break;
 
           case 'fifo':
-            var id = args._[2] || 0;
-            var value = args._[3] || 0;
+            id = args._[2] || 0;
+            value = args._[3] || 0;
             master.writeFifo8( id, [value], output );
             break;
 
@@ -458,6 +509,7 @@ else {
   });
 
   // Hook events for logging
+
 
   var connection = master.getConnection();
 
@@ -543,17 +595,6 @@ else {
 
 
 
-  // Open the port
-  // the 'open' event is triggered when complete
-  if( args.v ) {
-    serialLog.info( 'Opening ' + config.port.name );
-  }
 
-  port.open(function(err) {
-    if( err ) {
-      console.log(err);
-      exit(1);
-    }
-  });
 }
 

@@ -63,6 +63,15 @@ The "port" object is used to configure a serial port connection.  It has the fol
 - _stopBits:_ Stop Bits, defaults to 1. Must be one of: 1 or 2.
 - _parity:_ Parity, defaults to 'none'. Must be one of: 'none', 'even', 'mark', 'odd', 'space'
 
+The "websocket" object controls the behavior of a "websocket" type connection.  It has the following settings:
+- _url_ the websocket URL to connect
+- _reconnection_ whether to reconnect automatically (true)
+- _reconnectionAttempts_ (Infinity) before giving up
+- _reconnectionDelay_ how long to initially wait before attempting a new reconnection (1000). Affected by +/- randomizationFactor, for example the default initial delay will be between 500 to 1500ms.
+- _reconnectionDelayMax_ maximum amount of time to wait between reconnections (5000). Each attempt increases the reconnection delay by 2x along with a randomization as above
+randomizationFactor (0.5), 0 <= randomizationFactor <= 1
+- _timeout_ connection timeout before a connect_error and connect_timeout events are emitted (20000)
+
 The "master" object controls the behavior of the MODBUS master.  It has the following options:
 * _transport:_ Determines how messages will be framed and encoded for transport over the connection.  _rtu_ for (standard) MODBUS RTU, _ascii_ for (standard) MODBUS ASCII, _ip_ for (standard) MODBUS TCP/IP, and _tunnel_ for (Control Solutions proprietary) tunneling of MODBUS commands over an RTU-based network.  Using _tunnel_ allows cs-modbus to act like a master, even as it participates on the physical network as a slave.  This setting requires the 'real' MODBUS master to implement SLAVE_COMMAND polling, as defined in CS document *DOC0003824A-SRS-A*
 ** _slaveId_ is only used for the _tunnel_ transport; it defines the slave address that cs-modbus will monitor for SLAVE_COMMAND messages.
@@ -84,6 +93,14 @@ The mb utility allows simple MODBUS interactions with an attached slave.  After 
 `node mb -h` shows the available command line options
 `node mb read holding 0 3` reads three registers starting at address 0 
 `node mb read holding 0 3 -v` reads the same three registers and outputs verbose diagnostic information, including the exact bytes transmitted and received over the link. 
+
+If the cs-modbus package is installed 'globally':
+`npm install csllc/cs-modbus.git -g`
+the `mb` utility will be available at any terminal prompt, regardless of folder.  In this case, it is simplest to use the environment variable configurations rather than edit the config.json file.  For example:
+`set MODBUS_PORT=COM1`
+`set MODBUS_SLAVE=10`
+`set MODBUS_BAUD=19200`
+_(notice 'set' is used on Windows platforms, 'export' is the Mac equivalent)_
 
 ## Using cs-modbus to build an application
 
