@@ -31,7 +31,7 @@
     "mb": "mb.js"
   },
   "dependencies": {
-    "h5.buffers": "~0.1.1"
+    "h5.buffers": "~0.1.1",
     "chalk": "^1.1.1",
     "minimist": "^1.2.0",
     "serialport": "^2.0.6",
