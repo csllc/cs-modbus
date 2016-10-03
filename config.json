@@ -3,7 +3,7 @@
     "name2" : "/dev/cu.usbserial-FTYXTE2T",
 		"name" : "/dev/cu.usbserial",
 		"options" : {
-			"baudrate": 57600
+			"baudrate": 19200
 		}
 	},
   "websocket": {
@@ -16,7 +16,7 @@
   },
 	"master" : {
   		"transport": {
-    		"type": "tunnel",
+    		"type": "rtu",
         "eofTimeout": 75,
         
     		"connection": {
@@ -27,7 +27,7 @@
   		"suppressTransactionErrors": true,
   		"retryOnException": false,
   		"maxConcurrentRequests": 2,
-  		"defaultUnit": 16,
+  		"defaultUnit": 1,
   		"defaultMaxRetries": 0,
   		"defaultTimeout": 2000
 	}

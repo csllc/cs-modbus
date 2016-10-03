@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "cs-ble-controller": "git+ssh://git@github.com:csllc/cs-ble-controller",
     "grunt": "~0.4.1",
     "grunt-cli": "~0.1.7",
     "grunt-contrib-clean": "~0.4.1",
