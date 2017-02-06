@@ -53,7 +53,8 @@ config.port.options.baudrate = args.baudrate ||
   process.env.MODBUS_BAUDRATE ||
   config.port.options.baudrate;
 
-
+// don't open serial port until we explicitly call the open method
+config.port.options.autoOpen = false;
 
 /**
  * Clean up and exit the application.
@@ -291,10 +292,9 @@ else {
   if( config.master.transport.connection.type === 'serial') {
 
     // Open the serial port we are going to use
-    port = new serialPortFactory.SerialPort(
+    port = new serialPortFactory(
       config.port.name,
-      config.port.options,
-      false );
+      config.port.options);
 
     // Make serial port instance available for the modbus master
     config.master.transport.connection.serialPort = port;

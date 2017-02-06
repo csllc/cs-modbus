@@ -1,9 +1,8 @@
 {
 	"port" : {
-    "name2" : "/dev/cu.usbserial-FTYXTE2T",
-		"name" : "/dev/cu.usbserial",
+		"name" : "/dev/cu.usbserial-FTYXQCAR",
 		"options" : {
-			"baudrate": 19200
+			"baudrate": 115200
 		}
 	},
   "websocket": {
