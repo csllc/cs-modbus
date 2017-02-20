@@ -10,6 +10,9 @@
  */
 'use strict';
 
+// the json file where our default configuration is located
+var CONFIG_FILE = './config.json';
+
 // get application path
 var path = require('path');
 
@@ -23,13 +26,13 @@ var chalk = require('chalk');
 var args = require('minimist')(process.argv.slice(2));
 
 // Configuration defaults
-var config = require('./config');
+var config = require( CONFIG_FILE );
 
 // Keep track of mode for output purposes (boolean)
 var isAscii = (config.master.transport.type === 'ascii');
 
 // Module which manages the serial port
-var serialPortFactory = require('serialport');
+var SerialPortFactory = require('serialport');
 
 // logging helper module
 var winston = require('winston');
@@ -56,6 +59,20 @@ config.port.options.baudrate = args.baudrate ||
 // don't open serial port until we explicitly call the open method
 config.port.options.autoOpen = false;
 
+// if the user included the --save option, write the 
+// actual configuration back to the config.json file to be
+// the defaults for next time
+if( args.save ) {
+  var fs = require('fs');
+
+  console.info( chalk.green('Writing configuration file\r'));
+  fs.writeFile( CONFIG_FILE, JSON.stringify(config, null, 4));
+
+}
+
+// Keep track of when the action started, for timing purposes
+var startTime;
+
 /**
  * Clean up and exit the application.
  *
@@ -77,17 +94,58 @@ function exit(code) {
  * @return null
  */
 function output( err, response ) {
+
   if( err ) {
     //console.log( chalk.red( err.message ) );
     exit(1);
   }
   else {
-    //console.log(response);
-    exit(0);
+
+    // output the result in the requested format
+    if( 'csv' === args.out ) {
+
+      var timemark = new Date().getTime() - startTime;
+      console.info( timemark + ',' + response.toBuffer().join(','));
+
+    }
+
+    // if caller requested a loop, do the action again
+    if( args.loop ) {
+      setImmediate( doAction );
+    }
+    else {
+      exit(0);
+    }
   }
 }
 
+/**
+ * Parses a string into a number with bounds check
+ *
+ * String can be decimal, or if it starts with 0x
+ * it is interpreted as hex
+ *
+ * @param  {[string]} s       string to parse
+ * @param  {[number]} default if string can't be parsed
+ * @return {[number]}         the parsed number or the default
+ */
+function parseNumber( s, def )
+{
+  var number;
 
+  if( 'undefined' === typeof( s )) {
+    return def;
+  }
+
+  if( s.toString().substring(0,1) === '0x') {
+    number = parseInt(s.substring(2), 16);
+  }
+  else {
+    number = parseInt(s);
+  }
+  return number;
+
+}
 /**
  * Convert an array of args to an array of numbers
  *
@@ -193,6 +251,10 @@ if( args.h  ) {
   console.info( '    -h          This help output\r');
   console.info( '    -l          List all ports on the system\r');
   console.info( '    -v          Verbose output (for debugging)\r');
+  console.info( '    --save      Write configuration to defaults\r');
+  console.info( '    --loop      Repeat command until CTRL-C\r'); 
+  console.info( '    --log       Write info to specified logfile\r');
+  console.info( '    --out       Output type (eg csv)\r');  
   console.info( '    --port      Specify serial port to use\r');
   console.info( '    --slave     ' +
     'Specify MODBUS slave ID to communicate with\r');
@@ -206,159 +268,19 @@ if( args.h  ) {
   console.info( 'mb write holding 0 0x100 32 23  ' +
     '(writes register 0, 1, and 2)\r');
   console.info( 'mb read slave  (retrieve device info)\r');
+  console.info( 'mb read slave --port=COM1 --baud=19200 ' +
+    '--slave=12 --save (save defaults)\r');
+  console.info( 'mb read object 3 --loop --out=csv' +
+    ' (keep reading object 3 and print in CSV)\r' );
+  console.info( 'mb read holding 0x100 2 --loop --out=csv' +
+    ' --log=debug.log (keep reading object 3 and print in CSV)\r' );
 
   process.exit(0);
 }
 
 
-// Check for the list ports option
-if( args.l ) {
-
-  // Retrieve a list of all ports detected on the system
-  serialPortFactory.list(function (err, ports) {
-
-    if( err ) {
-      console.error( err );
-    }
-
-    if( ports ) {
-      // ports is now an array of port descriptions.
-      ports.forEach(function(port) {
-
-        // print each port description
-        console.log(port.comName +
-        ' : ' + port.pnpId + ' : ' + port.manufacturer );
-
-      });
-    }
-
-    process.exit(0);
-
-  });
-
-}
-else {
-
-  // Check the action argument for validity
-  var action = args._[0];
-
-  if( ['read', 'write', 'command'].indexOf( action ) < 0 ) {
-    console.error(chalk.red( 'Unknown Action ' + action + ' Requested'));
-    exit(1);
-  }
-
-
-  //
-  // Configure the serial port logger
-  // This logs to the console only if the -v option is used
-  // Logs to a file if the --log option is used
-  //
-  winston.loggers.add('serial');
-
-  var serialLog = winston.loggers.get('serial');
-  serialLog.remove(winston.transports.Console);
-  if( args.v ){
-    serialLog.add(winston.transports.Console, {
-        level: 'silly',
-        colorize: true,
-        label: 'serial'
-    });
-  }
-  if( args.log > '' ){
-    serialLog.add(winston.transports.File, { filename: args.log });
-  }
-
-
-  //
-  // Configure the transport logger
-  // This logs to the console always
-  // Logs to a file if the --log option is used
-  //
-
-  winston.loggers.add('transaction',{
-      console: {
-        level: 'silly',
-        colorize: true,
-        label: 'transaction'
-      },
-  });
-  var transLog = winston.loggers.get('transaction');
-  if( args.log > '' ){
-    transLog.add(winston.transports.File, { filename: args.log });
-  }
-
-  var port;
-
-  if( config.master.transport.connection.type === 'serial') {
-
-    // Open the serial port we are going to use
-    port = new serialPortFactory(
-      config.port.name,
-      config.port.options);
-
-    // Make serial port instance available for the modbus master
-    config.master.transport.connection.serialPort = port;
-
-    // Open the port
-    // the 'open' event is triggered when complete
-    if( args.v ) {
-      serialLog.info( 'Opening ' + config.port.name );
-    }
-
-    port.open(function(err) {
-      if( err ) {
-        console.log(err);
-        exit(1);
-      }
-    });
-  }
-  else if( config.master.transport.connection.type === 'websocket') {
-    port = require('socket.io-client')(config.websocket.url, config.websocket);
-
-    // Make socket instance available for the modbus master
-    config.master.transport.connection.socket = port;
-
-    port.on('connect_error', function(err){
-      serialLog.info( '[connection#connect_error]');
-    });
-
-    port.on('connect_timeout', function(){
-      serialLog.info( '[connection#connect_timeout]');
-    });
-
-    port.on('reconnect', function(attempt){
-      serialLog.info( '[connection#reconnect] ', attempt);
-    });
-
-    port.on('reconnecting', function(attempt){
-      serialLog.info( '[connection#reconnecting] ', attempt);
-    });
-
-    port.on('reconnect_error', function(err){
-      serialLog.info( '[connection#reconnect_error] ');
-    });
-
-    port.on('reconnect_failed', function(){
-      serialLog.info( '[connection#reconnect_failed] ');
-    });
-
-    port.on('ping', function(){
-      serialLog.info( '[connection#ping] ');
-    });
-
-    port.on('pong', function(ms){
-      serialLog.info( '[connection#pong] ', ms);
-    });
-
-  }
-
-
-  // Create the MODBUS master
-  var master = ModbusPort.createMaster( config.master );
-
-
-  // Attach event handler for the port opening
-  master.once( 'connected', function () {
+// Once the port is connected, do whatever action was requested
+function doAction () {
 
     var address;
     var quantity;
@@ -415,11 +337,11 @@ else {
             break;
 
           case 'memory':
-            type = args._[2] || 0;
-            var page = args._[3] || 0;
-            address = args._[4] || 0;
-            var length = args._[5] || 250;
-            master.readMemory( type, page, address, length, output );
+            
+            address = parseNumber(args._[2], 0 );
+            var length = parseNumber(args._[3],1 );
+            
+            master.readMemory( address, length, output );
             break;
 
           default:
@@ -500,7 +422,169 @@ else {
         exit(1);
         break;
     }
+}
 
+// Check for the list ports option
+if( args.l ) {
+
+  // Retrieve a list of all ports detected on the system
+  SerialPortFactory.list(function (err, ports) {
+
+    if( err ) {
+      console.error( err );
+    }
+
+    if( ports ) {
+      // ports is now an array of port descriptions.
+      ports.forEach(function(port) {
+
+        // print each port description
+        console.log(port.comName +
+        ' : ' + port.pnpId + ' : ' + port.manufacturer );
+
+      });
+    }
+
+    process.exit(0);
+
+  });
+
+}
+else {
+
+  // Check the action argument for validity
+  var action = args._[0];
+
+  if( ['read', 'write', 'command'].indexOf( action ) < 0 ) {
+    console.error(chalk.red( 'Unknown Action ' + action + ' Requested'));
+    exit(1);
+  }
+
+
+  //
+  // Configure the serial port logger
+  // This logs to the console only if the -v option is used and --out option is
+  // not used
+  // Logs to a file if the --log option is used
+  //
+  winston.loggers.add('serial');
+
+  var serialLog = winston.loggers.get('serial');
+  serialLog.remove(winston.transports.Console);
+  if( args.v && !args.out ){
+    serialLog.add(winston.transports.Console, {
+        level: 'silly',
+        colorize: true,
+        label: 'serial'
+    });
+  }
+  if( args.log > '' ){
+    serialLog.add(winston.transports.File, { filename: args.log });
+  }
+
+
+  //
+  // Configure the transport logger
+  // This logs to the console always
+  // Logs to a file if the --log option is used
+  //
+
+  winston.loggers.add('transaction',{
+      console: {
+        level: 'silly',
+        colorize: true,
+        label: 'transaction'
+      },
+  });
+  var transLog = winston.loggers.get('transaction');
+
+  // Don't log transactions to console if the --out option is used
+  if( args.out > '' ) {
+    transLog.remove(winston.transports.Console);
+  }
+
+  // Log to output file if --log option is used
+  if( args.log > '' ){
+    transLog.add(winston.transports.File, { filename: args.log });
+  }
+
+  var port;
+
+  if( config.master.transport.connection.type === 'serial') {
+
+    // Open the serial port we are going to use
+    port = new SerialPortFactory(
+      config.port.name,
+      config.port.options);
+
+    // Make serial port instance available for the modbus master
+    config.master.transport.connection.serialPort = port;
+
+    // Open the port
+    // the 'open' event is triggered when complete
+    if( args.v ) {
+      serialLog.info( 'Opening ' + config.port.name );
+    }
+
+    port.open(function(err) {
+      if( err ) {
+        console.log(err);
+        exit(1);
+      }
+    });
+  }
+  else if( config.master.transport.connection.type === 'websocket') {
+    port = require('socket.io-client')(config.websocket.url, config.websocket);
+
+    // Make socket instance available for the modbus master
+    config.master.transport.connection.socket = port;
+
+    port.on('connect_error', function(err){
+      serialLog.info( '[connection#connect_error]', err );
+    });
+
+    port.on('connect_timeout', function(){
+      serialLog.info( '[connection#connect_timeout]');
+    });
+
+    port.on('reconnect', function(attempt){
+      serialLog.info( '[connection#reconnect] ', attempt);
+    });
+
+    port.on('reconnecting', function(attempt){
+      serialLog.info( '[connection#reconnecting] ', attempt);
+    });
+
+    port.on('reconnect_error', function(err){
+      serialLog.info( '[connection#reconnect_error] ', err );
+    });
+
+    port.on('reconnect_failed', function(){
+      serialLog.info( '[connection#reconnect_failed] ');
+    });
+
+    port.on('ping', function(){
+      serialLog.info( '[connection#ping] ');
+    });
+
+    port.on('pong', function(ms){
+      serialLog.info( '[connection#pong] ', ms);
+    });
+
+  }
+
+
+  // Create the MODBUS master
+  var master = ModbusPort.createMaster( config.master );
+
+
+  // Attach event handler for the port opening
+  master.once( 'connected', function() {
+
+    // remember when we started for timing purposes
+    startTime = new Date().getTime();
+    
+    doAction(); 
   });
 
   // port errors
@@ -581,7 +665,7 @@ else {
       {
         transLog.info('[complete] %s', response);
       }
-      exit(0);
+      //exit(0);
     });
 
     transaction.once('cancel', function()

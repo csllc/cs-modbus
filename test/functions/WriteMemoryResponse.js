@@ -114,7 +114,7 @@ describe("WriteMemoryResponse", function()
   {
     it("should return a string", function()
     {
-      new WriteMemoryResponse(0x01).toString().should.be.a('string');
+      new WriteMemoryResponse(0x01).toString().should.be.a.String();
     });
   });
 

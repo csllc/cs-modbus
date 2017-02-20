@@ -50,20 +50,20 @@ describe("ReadMemoryResponse", function()
 
   describe("fromBuffer", function()
   {
-    it("should throw if the specified Buffer is not at least 3 bytes long", function()
+    it("should throw if the specified Buffer is not at least 2 bytes long", function()
     {
-      function test1()
+      function test0()
       {
         ReadMemoryResponse.fromBuffer(new Buffer([]));
       }
 
-      function test2()
+      function test1()
       {
-        ReadMemoryResponse.fromBuffer(new Buffer([0x04, 0x00]));
+        ReadMemoryResponse.fromBuffer(new Buffer([0x04]));
       }
 
       test1.should.throw();
-      test2.should.throw();
+      test0.should.throw();
     });
 
     it("should throw if the first byte is an invalid function code", function()
@@ -76,18 +76,18 @@ describe("ReadMemoryResponse", function()
       test.should.throw();
     });
 
-    it("should read N bytes starting at 2 where N is a byte at 1 as a values Buffer", function()
+    it("should read N bytes starting at 1 as a values Buffer", function()
     {
-      ReadMemoryResponse.fromBuffer(new Buffer([0x45, 0x02, 0x11, 0x22]))
+      ReadMemoryResponse.fromBuffer(new Buffer([0x45, 0x11, 0x22]))
         .getValues().should.be.eql(new Buffer([0x11, 0x22]));
     });
   });
 
   describe("toBuffer", function()
   {
-    it("should return a 3 byte long Buffer for one value", function()
+    it("should return a 2 byte long Buffer for one value", function()
     {
-      new ReadMemoryResponse(new Buffer([0x04])).toBuffer().length.should.be.equal(3);
+      new ReadMemoryResponse(new Buffer([0x04])).toBuffer().length.should.be.equal(2);
     });
 
     it("should write the function code as uint8 at 0", function()
@@ -95,19 +95,14 @@ describe("ReadMemoryResponse", function()
       new ReadMemoryResponse(new Buffer([0x04, 0x00])).toBuffer()[0].should.be.equal(0x45);
     });
 
-    it("should write the following byte count as uint8 at 1", function()
-    {
-      new ReadMemoryResponse(new Buffer([0x11, 0x22])).toBuffer()[1].should.be.equal(2);
-    });
-
-    it("should write the Buffer of values at 2", function()
+    it("should write the Buffer of values at 1", function()
     {
       var res = new ReadMemoryResponse(new Buffer([0x11, 0x22, 0x33]));
       var buf = res.toBuffer();
 
-      buf[2].should.be.equal(0x11);
-      buf[3].should.be.equal(0x22);
-      buf[4].should.be.equal(0x33);
+      buf[1].should.be.equal(0x11);
+      buf[2].should.be.equal(0x22);
+      buf[3].should.be.equal(0x33);
     });
   });
 
@@ -115,7 +110,7 @@ describe("ReadMemoryResponse", function()
   {
     it("should return a string", function()
     {
-      new ReadMemoryResponse(new Buffer([0x11, 0x22, 0x33])).toString().should.be.a('string');
+      new ReadMemoryResponse(new Buffer([0x11, 0x22, 0x33])).toString().should.be.a.String();
     });
   });
 

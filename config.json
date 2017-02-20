@@ -1,34 +1,33 @@
 {
-	"port" : {
-		"name" : "/dev/cu.usbserial-FTYXQCAR",
-		"options" : {
-			"baudrate": 115200
-		}
-	},
-  "websocket": {
-    "url": "http://127.0.0.1:8080",
-    "reconnection": true,
-    "reconnectionAttempts": 3,
-    "reconnectionDelay": 1000,
-    "reconnectionDelayMax": 5000,
-    "timeout": 5000
-  },
-	"master" : {
-  		"transport": {
-    		"type": "rtu",
-        "eofTimeout": 75,
-        
-    		"connection": {
-      			"type": "serial",
-            "socket": "Replace with an instance of io()"
-      		}
-      	},
-  		"suppressTransactionErrors": true,
-  		"retryOnException": false,
-  		"maxConcurrentRequests": 2,
-  		"defaultUnit": 1,
-  		"defaultMaxRetries": 0,
-  		"defaultTimeout": 2000
-	}
-
+    "port": {
+        "name": "/dev/cu.usbserial-FTWXEB9G",
+        "options": {
+            "baudrate": 115200,
+            "autoOpen": false
+        }
+    },
+    "websocket": {
+        "url": "http://127.0.0.1:8080",
+        "reconnection": true,
+        "reconnectionAttempts": 3,
+        "reconnectionDelay": 1000,
+        "reconnectionDelayMax": 5000,
+        "timeout": 5000
+    },
+    "master": {
+        "transport": {
+            "type": "rtu",
+            "eofTimeout": 75,
+            "connection": {
+                "type": "serial",
+                "socket": "Replace with an instance of io()"
+            }
+        },
+        "suppressTransactionErrors": true,
+        "retryOnException": false,
+        "maxConcurrentRequests": 2,
+        "defaultUnit": 1,
+        "defaultMaxRetries": 0,
+        "defaultTimeout": 2000
+    }
 }

@@ -1,30 +1,50 @@
 # cs-modbus
 
-Implementation of the Modbus TCP/ASCII/RTU master for node.js.
-This module is based on h5.modbus, and contains extensions and improvements
-for use with Control Solutions MODBUS products.
-
-It can be used by itself - the utilities implement basic MODBUS interactions and test features - or as a library module to develop product-specific extensions.
+A command line utility implementing a Modbus TCP/ASCII/RTU master for node.js.
+This module is based on h5.modbus.
 
 ## Prerequisites
 Install nodejs for your platform (http://nodejs.org)
 This will make the `node` and `npm` executables available.
 
-## Using the Utility Programs
-Copy or clone the repository to a new folder (e.g via Github .zip file download or cloning). 
+## Installing the utility
+From a terminal window, use the command
+`npm install -g cs-modbus`
 
-Navigate to the folder that contains the package.json file.  The instructions/paths below are relative to this folder.  Forward-slash (Unix/Mac) file paths are used; Windows users should adjust to backslash\file\paths as necessary.
+The utility is now available as a terminal command.  To see the available options, use
+`mb -h`.
+You can list the available serial ports on your system by using the 
+`mb -l` command.
 
-Use `npm install` to install dependent packages.
+## Configuration 
+Configuration (for example, how the programs communicate with the target devices) can be controlled in multiple ways.  These are listed in order of priority (command line options have precedence over environment variables have precedence over the config file).
 
-### Configuration for Utility Programs
-Configuration (for example, how the programs communicate with the target devices) can be controlled in multiple ways.  These are listed in order of priority (command line options have precedence over environment variables have precedence over config.json)
-* Editing the `config.json` file
-* Setting operating system environment variables(s).  For example, if MODBUS_PORT=COM1 is set as an environment variable, it will be used instead of a port specified in config.json. 
-* Using command line options: running the utility programs with the `-h` option will list the available command line options for that utility.
+### Command line options
+Options can be specified in the terminal when executing the utility.  For available options, see `mb -h'.  For example:
+`mb read slave --port=COM1`
+Reads the attached slave id using serial port COM1
 
-#### Config.json
-The config.json must be a properly-formatted JSON file:
+### Environment variables
+Using environment variables allows you to set the configuration in each terminal window, so it does not have to be specified on each command.  The method to set environment variables depends on your operating system.  For example, on Windows you can use
+`set MODBUS_PORT=COM1`
+On Mac or Linux, you can use
+`export MODBUS_PORT=/dev/cu.usbserial`
+
+See `mb -h` for the available environment variables
+
+### Configuration file
+If neither the command line option nor environment variable is specified, the configuration stored in a local file is used (it is called config.json, in the installation folder).
+Rather than editing this file directly, you can use the --save command line option, which will save the actual configuration to the config.json file.  For example,
+`mb --port=COM2 --save`
+
+Will save COM2 as the default serial port.
+
+## Command examples
+Refer to `mb -h` for a full list of commands.  Some examples to get you started:
+
+## Format of the config file
+For advanced configuration options, you can edit the config.json file directly.
+It must be a properly-formatted JSON file:
 ```JSON
 {
   "port" : {
