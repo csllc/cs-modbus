@@ -2,8 +2,7 @@
     "port": {
         "name": "/dev/cu.usbserial-FTWXEB9G",
         "options": {
-            "baudrate": 115200,
-            "autoOpen": false
+            "baudrate": 57600
         }
     },
     "websocket": {
@@ -16,8 +15,8 @@
     },
     "master": {
         "transport": {
-            "type": "rtu",
-            "eofTimeout": 75,
+            "type": "tunnel",
+            "eofTimeout": 50,
             "connection": {
                 "type": "serial",
                 "socket": "Replace with an instance of io()"
@@ -26,7 +25,7 @@
         "suppressTransactionErrors": true,
         "retryOnException": false,
         "maxConcurrentRequests": 2,
-        "defaultUnit": 1,
+        "defaultUnit": 16,
         "defaultMaxRetries": 0,
         "defaultTimeout": 2000
     }

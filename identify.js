@@ -8,9 +8,6 @@
 // get application path
 var path = require('path');
 
-// misc utilities
-var util = require('util');
-
 // console text formatting
 var chalk = require('chalk');
 
@@ -50,8 +47,9 @@ console.log(ports);
   var numPorts = ports.length;
 
   ports.forEach(function(port) {
-console.log('opening ' + port.comName, config.port.options );
-    var serialport = new serialPortFactory.SerialPort( port.comName, config.port.options, false);
+    console.log('opening ' + port.comName, config.port.options );
+    var serialport = new serialPortFactory.SerialPort( 
+      port.comName, config.port.options, false);
 
     // Make serial port available for the modbus master
     config.master.transport.connection.serialPort = serialport;
@@ -62,7 +60,8 @@ console.log('opening ' + port.comName, config.port.options );
     try{
     serialport.open( function(error) {
       if( error ) {
-        console.error( chalk.bold(port.comName) + ': Unable to open(' + error + ')');
+        console.error( chalk.bold(port.comName) + 
+          ': Unable to open(' + error + ')');
         numPorts--;
         if( 0 === numPorts ) {
           process.exit();
@@ -78,12 +77,13 @@ catch( e ) {
     master.once( 'connected', function () {
 
       // query the slave
-      master.reportSlaveId({ maxRetries: 0, onComplete: function(err, response) {
+      master.reportSlaveId({ maxRetries: 0, 
+        onComplete: function(err, response) {
         if( err) {
           console.log( chalk.bold(port.comName) + ': No device found' );
         }
         else {
-          console.log( port.comName + ': ' + id.toString() );
+          console.log( port.comName + ': ' + response.toString() );
         }
 
         master.destroy();

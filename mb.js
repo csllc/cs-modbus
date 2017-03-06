@@ -56,9 +56,6 @@ config.port.options.baudrate = args.baudrate ||
   process.env.MODBUS_BAUDRATE ||
   config.port.options.baudrate;
 
-// don't open serial port until we explicitly call the open method
-config.port.options.autoOpen = false;
-
 // if the user included the --save option, write the 
 // actual configuration back to the config.json file to be
 // the defaults for next time
@@ -66,9 +63,13 @@ if( args.save ) {
   var fs = require('fs');
 
   console.info( chalk.green('Writing configuration file\r'));
-  fs.writeFile( CONFIG_FILE, JSON.stringify(config, null, 4));
+  fs.writeFileSync( CONFIG_FILE, JSON.stringify(config, null, 4));
 
 }
+
+// don't open serial port until we explicitly call the open method
+config.port.options.autoOpen = false;
+
 
 // Keep track of when the action started, for timing purposes
 var startTime;
@@ -286,7 +287,7 @@ function doAction () {
     var quantity;
     var id;
     var max;
-    var value;
+    var values;
 
     // Now do the action that was requested
     switch( action ) {
@@ -336,13 +337,14 @@ function doAction () {
             master.readObject( id, output );
             break;
 
-          case 'memory':
+          case 'memory': {
             
             address = parseNumber(args._[2], 0 );
             var length = parseNumber(args._[3],1 );
             
             master.readMemory( address, length, output );
             break;
+          }
 
           default:
             console.error( chalk.red('Trying to read unknown item ' + type ));
@@ -359,13 +361,13 @@ function doAction () {
         switch( type ) {
           case 'coil':
             address = args._[2] || 0;
-            value = args._[3] || 1;
-            master.writeSingleCoil( address, value, output );
+            values = args._[3] || 1;
+            master.writeSingleCoil( address, values, output );
             break;
 
-          case 'holding':
+          case 'holding': {
             address = args._[2] || 0;
-            var values = argsToWordBuf( args._, 3 );
+            values = argsToWordBuf( args._, 3 );
 
             if( values.length < 2 ){
               console.error( chalk.red('No values specified ' ));
@@ -375,11 +377,12 @@ function doAction () {
               master.writeMultipleRegisters( address, values, output );
             }
             break;
+          }
 
           case 'fifo':
             id = args._[2] || 0;
-            value = args._[3] || 0;
-            master.writeFifo8( id, [value], output );
+            values = args._[3] || 0;
+            master.writeFifo8( id, [values], output );
             break;
 
           //case 'object':
@@ -387,13 +390,13 @@ function doAction () {
           //  master.writeObject( id, output );
           //  break;
 
-          //case 'memory':
-          //  var type = args._[2] || 0;
-          //  var page = args._[3] || 0;
-          //  var address = args._[4] || 0;
-          //  var length = args._[5] || 250;
-          //  master.writeMemory( type, page, address, length, output );
-          //  break;
+          case 'memory': {
+            address = parseNumber(args._[2], 0 );
+            values = argsToByteBuf( args._, 3 );
+
+            master.writeMemory( address, values, output );
+            break;
+          }
 
           default:
             console.error( chalk.red('Trying to write unknown item ' + type ));
@@ -572,7 +575,45 @@ else {
     });
 
   }
+  else if( config.master.transport.connection.type === 'ble') {
+    port = require('./lib/')(config.websocket.url, config.websocket);
 
+    // Make socket instance available for the modbus master
+    config.master.transport.connection.socket = port;
+
+    port.on('connect_error', function(err){
+      serialLog.info( '[connection#connect_error]', err );
+    });
+
+    port.on('connect_timeout', function(){
+      serialLog.info( '[connection#connect_timeout]');
+    });
+
+    port.on('reconnect', function(attempt){
+      serialLog.info( '[connection#reconnect] ', attempt);
+    });
+
+    port.on('reconnecting', function(attempt){
+      serialLog.info( '[connection#reconnecting] ', attempt);
+    });
+
+    port.on('reconnect_error', function(err){
+      serialLog.info( '[connection#reconnect_error] ', err );
+    });
+
+    port.on('reconnect_failed', function(){
+      serialLog.info( '[connection#reconnect_failed] ');
+    });
+
+    port.on('ping', function(){
+      serialLog.info( '[connection#ping] ');
+    });
+
+    port.on('pong', function(ms){
+      serialLog.info( '[connection#pong] ', ms);
+    });
+
+  }
 
   // Create the MODBUS master
   var master = ModbusPort.createMaster( config.master );
@@ -679,6 +720,10 @@ else {
 
 
 
+  // catch sniff messages (from tunnel transport only)
+  transport.on('sniff', function(msg, buf) {
+    transLog.info('[sniff] ' + msg, buf );
+  });
 
 }
 

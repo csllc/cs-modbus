@@ -71,6 +71,7 @@ module.exports = function(grunt)
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-simple-mocha');
   grunt.loadNpmTasks('grunt-istanbul');
+  grunt.loadNpmTasks('grunt-browserify');
 
   grunt.registerTask('test', [
     'env:default',
