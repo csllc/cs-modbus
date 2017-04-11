@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Modbus = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.modbus = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
 },{}],2:[function(require,module,exports){
 'use strict'
@@ -3951,7 +3951,7 @@ Master.prototype.scheduleExecution = function(transaction)
   });
 };
 
-},{"./Transaction":14,"./functions":64,"events":4,"util":9}],12:[function(require,module,exports){
+},{"./Transaction":14,"./functions":65,"events":4,"util":9}],12:[function(require,module,exports){
 /*jshint unused:false*/
 
 'use strict';
@@ -4630,7 +4630,7 @@ Transaction.prototype.handleTimeout = function(cb)
 };
 
 }).call(this,require('_process'))
-},{"./errors":22,"./functions/Request":46,"_process":6,"events":4,"util":9}],15:[function(require,module,exports){
+},{"./errors":23,"./functions/Request":47,"_process":6,"events":4,"util":9}],15:[function(require,module,exports){
 /*jshint unused:false*/
 
 'use strict';
@@ -4811,6 +4811,98 @@ BleConnection.prototype.setUpSocket = function( device )
 };
 
 },{"../Connection":10,"util":9}],17:[function(require,module,exports){
+/**
+ * Implements a generic connection class 
+ * This can be used when you have a connection type that isn't embedded
+ * in the cs-modbus library.  You create your connection externally, and 
+ * pass the object to the cs-modbus library.  As long as it 
+ * implements the correct interface, this will glue it into CS-MODBUS
+ * 
+ */
+'use strict';
+
+var util = require('util');
+var Connection = require('../Connection');
+
+module.exports = GenericConnection;
+
+/**
+ * @constructor
+ * @extends {Connection}
+ * @param {GenericConnection.Options|object} options
+ * @event open Alias to the `listening` event of the underlying `dgram.Socket`.
+ * @event close Alias to the `close` event of the underlying `dgram.Socket`.
+ * @event error Emitted when the underlying `dgram.Socket` emits the `error`
+ * event or its `send()` method throws.
+ * @event write Emitted before writing any data to the underlying
+ * `dgram.Socket` (even if the socket is closed).
+ * @event data Alias to the `message` event of the underlying `dgram.Socket`.
+ */
+function GenericConnection( connection )
+{
+  Connection.call(this);
+
+  this.connection = connection;
+
+  // wire up the connection's events so they get passed to our listeners
+  connection.on('connected', this.emit.bind(this, 'open'));
+  connection.on('disconnected', this.emit.bind(this, 'close'));
+  connection.on('connect', this.emit.bind(this, 'open'));
+  connection.on('disconnect', this.emit.bind(this, 'close'));
+  connection.on('error', this.emit.bind(this, 'error'));
+  connection.on('data', this.emit.bind(this, 'data'));
+
+  // if already connected, let our listeners know
+  if( connection.isConnected() ) {
+    this.emit( 'open' );
+  }
+}
+
+util.inherits(GenericConnection, Connection);
+
+
+GenericConnection.prototype.destroy = function(){
+  this.removeAllListeners();
+
+  if (this.connection )
+  {
+    try {
+      this.connection.destroy();
+    }
+    catch( e ) {
+
+    }
+    this.connection = null;
+  }
+};
+
+/**
+ * @returns {boolean} Returns `true` if the underlying connection is open
+ */
+GenericConnection.prototype.isOpen = function()
+{
+  return this.connection.isConnected();
+};
+
+/**
+ * @param {Buffer} data
+ */
+GenericConnection.prototype.write = function(data)
+{
+  this.emit('write', data);
+
+  try
+  {
+    this.connection.write( data );
+  }
+  catch (err)
+  {
+    this.emit('error', err);
+  }
+};
+
+
+},{"../Connection":10,"util":9}],18:[function(require,module,exports){
 'use strict';
 
 var util = require('util');
@@ -4850,7 +4942,7 @@ NoConnection.prototype.write = function(data)
   }
 };
 
-},{"../Connection":10,"util":9}],18:[function(require,module,exports){
+},{"../Connection":10,"util":9}],19:[function(require,module,exports){
 'use strict';
 
 var util = require('util');
@@ -4959,7 +5051,7 @@ SerialConnection.prototype.setUpSerialPort = function(serialPort)
   return serialPort;
 };
 
-},{"../Connection":10,"util":9}],19:[function(require,module,exports){
+},{"../Connection":10,"util":9}],20:[function(require,module,exports){
 'use strict';
 
 var util = require('util');
@@ -5364,7 +5456,7 @@ TcpConnection.prototype.checkActivity = function()
   }
 };
 
-},{"../Connection":10,"net":1,"util":9}],20:[function(require,module,exports){
+},{"../Connection":10,"net":1,"util":9}],21:[function(require,module,exports){
 'use strict';
 
 var util = require('util');
@@ -5497,7 +5589,7 @@ UdpConnection.prototype.setUpSocket = function()
   return socket;
 };
 
-},{"../Connection":10,"util":9}],21:[function(require,module,exports){
+},{"../Connection":10,"util":9}],22:[function(require,module,exports){
 'use strict';
 
 var util = require('util');
@@ -5626,7 +5718,7 @@ WebsocketConnection.prototype.setUpSocket = function(socket)
   return socket;
 };
 
-},{"../Connection":10,"util":9}],22:[function(require,module,exports){
+},{"../Connection":10,"util":9}],23:[function(require,module,exports){
 'use strict';
 
 var inherits = require('util').inherits;
@@ -5698,7 +5790,7 @@ function createError(name, message)
   return ModbusError;
 }
 
-},{"util":9}],23:[function(require,module,exports){
+},{"util":9}],24:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -5851,7 +5943,7 @@ CommandRequest.prototype.getValues = function()
 
 
 }).call(this,require("buffer").Buffer)
-},{"./CommandResponse":24,"./Request":46,"./util":65,"buffer":3,"h5.buffers":75}],24:[function(require,module,exports){
+},{"./CommandResponse":25,"./Request":47,"./util":66,"buffer":3,"h5.buffers":77}],25:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -6010,7 +6102,7 @@ CommandResponse.prototype.getCount = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3,"h5.buffers":75}],25:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3,"h5.buffers":77}],26:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -6176,7 +6268,7 @@ ExceptionResponse.prototype.isException = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3}],26:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3}],27:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -6327,7 +6419,7 @@ ReadCoilsRequest.prototype.getQuantity = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./ReadCoilsResponse":27,"./Request":46,"./util":65,"buffer":3}],27:[function(require,module,exports){
+},{"./ReadCoilsResponse":28,"./Request":47,"./util":66,"buffer":3}],28:[function(require,module,exports){
 'use strict';
 
 var buffers = require('h5.buffers');
@@ -6486,7 +6578,7 @@ ReadCoilsResponse.prototype.isOff = function(offset)
   return !this.states[offset];
 };
 
-},{"./Response":47,"./util":65,"h5.buffers":75}],28:[function(require,module,exports){
+},{"./Response":48,"./util":66,"h5.buffers":77}],29:[function(require,module,exports){
 (function (Buffer){
 /*global require, module, ReadDiagnosticsRequest, Buffer*/
 
@@ -6633,7 +6725,7 @@ ReadDiagnosticsRequest.prototype.getValue = function () {
     return this.value;
 };
 }).call(this,require("buffer").Buffer)
-},{"./ReadDiagnosticsResponse":29,"./Request":46,"./util":65,"buffer":3}],29:[function(require,module,exports){
+},{"./ReadDiagnosticsResponse":30,"./Request":47,"./util":66,"buffer":3}],30:[function(require,module,exports){
 (function (Buffer){
 /*global require, module, ReadDiagnosticsResponse, Buffer*/
 
@@ -6771,7 +6863,7 @@ ReadDiagnosticsResponse.prototype.getValue = function () {
     return this.value;
 };
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3}],30:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3}],31:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -6925,7 +7017,7 @@ ReadDiscreteInputsRequest.prototype.getQuantity = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./ReadDiscreteInputsResponse":31,"./Request":46,"./util":65,"buffer":3}],31:[function(require,module,exports){
+},{"./ReadDiscreteInputsResponse":32,"./Request":47,"./util":66,"buffer":3}],32:[function(require,module,exports){
 'use strict';
 
 var buffers = require('h5.buffers');
@@ -7085,7 +7177,7 @@ ReadDiscreteInputsResponse.prototype.isOff = function(offset)
   return !this.states[offset];
 };
 
-},{"./Response":47,"./util":65,"h5.buffers":75}],32:[function(require,module,exports){
+},{"./Response":48,"./util":66,"h5.buffers":77}],33:[function(require,module,exports){
 'use strict';
 
 var buffers = require('h5.buffers');
@@ -7245,7 +7337,7 @@ ReadFifo8Request.prototype.getMax = function()
 /*jshint unused:false*/
 
 
-},{"./ReadFifo8Response":33,"./Request":46,"./util":65,"h5.buffers":75}],33:[function(require,module,exports){
+},{"./ReadFifo8Response":34,"./Request":47,"./util":66,"h5.buffers":77}],34:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -7411,7 +7503,7 @@ ReadFifo8Response.prototype.getStatus = function()
   return this.status;
 };
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3,"h5.buffers":75}],34:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3,"h5.buffers":77}],35:[function(require,module,exports){
 'use strict';
 
 var buffers = require('h5.buffers');
@@ -7609,7 +7701,7 @@ ReadFileRecordRequest.prototype.getSubRequests = function()
  */
 var ReadFileSubRequest;
 
-},{"./ReadFileRecordResponse":35,"./Request":46,"./util":65,"h5.buffers":75}],35:[function(require,module,exports){
+},{"./ReadFileRecordResponse":36,"./Request":47,"./util":66,"h5.buffers":77}],36:[function(require,module,exports){
 'use strict';
 
 var buffers = require('h5.buffers');
@@ -7778,7 +7870,7 @@ ReadFileRecordResponse.prototype.getTotalRecordDataLength = function()
   return this.subResponses.reduce(function(p, c) { return p + c.length; }, 0);
 };
 
-},{"./Response":47,"./util":65,"h5.buffers":75}],36:[function(require,module,exports){
+},{"./Response":48,"./util":66,"h5.buffers":77}],37:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -7931,7 +8023,7 @@ ReadHoldingRegistersRequest.prototype.getQuantity = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./ReadHoldingRegistersResponse":37,"./Request":46,"./util":65,"buffer":3}],37:[function(require,module,exports){
+},{"./ReadHoldingRegistersResponse":38,"./Request":47,"./util":66,"buffer":3}],38:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -8068,7 +8160,7 @@ ReadHoldingRegistersResponse.prototype.getCount = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3,"h5.buffers":75}],38:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3,"h5.buffers":77}],39:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -8224,7 +8316,7 @@ ReadInputRegistersRequest.prototype.getQuantity = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./ReadInputRegistersResponse":39,"./Request":46,"./util":65,"buffer":3}],39:[function(require,module,exports){
+},{"./ReadInputRegistersResponse":40,"./Request":47,"./util":66,"buffer":3}],40:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -8360,7 +8452,7 @@ ReadInputRegistersResponse.prototype.getCount = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3,"h5.buffers":75}],40:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3,"h5.buffers":77}],41:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -8508,7 +8600,7 @@ ReadMemoryRequest.prototype.getCount = function()
 
 
 }).call(this,require("buffer").Buffer)
-},{"./ReadMemoryResponse":41,"./Request":46,"./util":65,"buffer":3,"h5.buffers":75}],41:[function(require,module,exports){
+},{"./ReadMemoryResponse":42,"./Request":47,"./util":66,"buffer":3,"h5.buffers":77}],42:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -8637,7 +8729,7 @@ ReadMemoryResponse.prototype.getCount = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3,"h5.buffers":75}],42:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3,"h5.buffers":77}],43:[function(require,module,exports){
 'use strict';
 
 var buffers = require('h5.buffers');
@@ -8770,7 +8862,7 @@ ReadObjectRequest.prototype.getId = function()
 /*jshint unused:false*/
 
 
-},{"./ReadObjectResponse":43,"./Request":46,"./util":65,"h5.buffers":75}],43:[function(require,module,exports){
+},{"./ReadObjectResponse":44,"./Request":47,"./util":66,"h5.buffers":77}],44:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -8907,7 +8999,7 @@ ReadObjectResponse.prototype.getCount = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3,"h5.buffers":75}],44:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3,"h5.buffers":77}],45:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -9016,7 +9108,7 @@ ReportSlaveIdRequest.prototype.createResponse = function(responseBuffer)
 
 
 }).call(this,require("buffer").Buffer)
-},{"./ReportSlaveIdResponse":45,"./Request":46,"./util":65,"buffer":3,"h5.buffers":75}],45:[function(require,module,exports){
+},{"./ReportSlaveIdResponse":46,"./Request":47,"./util":66,"buffer":3,"h5.buffers":77}],46:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -9220,7 +9312,7 @@ ReportSlaveIdResponse.prototype.getValues = function()
   return this.values;
 };
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3,"h5.buffers":75}],46:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3,"h5.buffers":77}],47:[function(require,module,exports){
 /*jshint unused:false*/
 
 'use strict';
@@ -9285,7 +9377,7 @@ Request.prototype.createExceptionOrResponse = function(responseBuffer, Response)
   return Response.fromBuffer(responseBuffer);
 };
 
-},{"../ModbusFunction":12,"./ExceptionResponse":25,"./index":64,"util":9}],47:[function(require,module,exports){
+},{"../ModbusFunction":12,"./ExceptionResponse":26,"./index":65,"util":9}],48:[function(require,module,exports){
 'use strict';
 
 var inherits = require('util').inherits;
@@ -9313,7 +9405,7 @@ Response.prototype.isException = function()
   return false;
 };
 
-},{"../ModbusFunction":12,"util":9}],48:[function(require,module,exports){
+},{"../ModbusFunction":12,"util":9}],49:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -9484,7 +9576,7 @@ WriteFifo8Request.prototype.getValues = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Request":46,"./WriteFifo8Response":49,"./util":65,"buffer":3}],49:[function(require,module,exports){
+},{"./Request":47,"./WriteFifo8Response":50,"./util":66,"buffer":3}],50:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -9594,7 +9686,7 @@ WriteFifo8Response.prototype.getQuantity = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3}],50:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3}],51:[function(require,module,exports){
 'use strict';
 
 var buffers = require('h5.buffers');
@@ -9814,7 +9906,7 @@ WriteFileRecordRequest.prototype.getTotalRecordDataLength = function()
  */
 var WriteFileSubRequest;
 
-},{"./Request":46,"./WriteFileRecordResponse":51,"./util":65,"h5.buffers":75}],51:[function(require,module,exports){
+},{"./Request":47,"./WriteFileRecordResponse":52,"./util":66,"h5.buffers":77}],52:[function(require,module,exports){
 'use strict';
 
 var buffers = require('h5.buffers');
@@ -10020,7 +10112,7 @@ WriteFileRecordResponse.prototype.getTotalRecordDataLength = function()
  */
 var WriteFileSubResponse;
 
-},{"./Response":47,"./util":65,"h5.buffers":75}],52:[function(require,module,exports){
+},{"./Response":48,"./util":66,"h5.buffers":77}],53:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -10204,7 +10296,7 @@ WriteMemoryRequest.prototype.getValues = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Request":46,"./WriteMemoryResponse":53,"./util":65,"buffer":3}],53:[function(require,module,exports){
+},{"./Request":47,"./WriteMemoryResponse":54,"./util":66,"buffer":3}],54:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -10314,7 +10406,7 @@ WriteMemoryResponse.prototype.getStatus = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3}],54:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3}],55:[function(require,module,exports){
 'use strict';
 
 var buffers = require('h5.buffers');
@@ -10483,7 +10575,7 @@ WriteMultipleCoilsRequest.prototype.getStates = function()
   return this.states;
 };
 
-},{"./Request":46,"./WriteMultipleCoilsResponse":55,"./util":65,"h5.buffers":75}],55:[function(require,module,exports){
+},{"./Request":47,"./WriteMultipleCoilsResponse":56,"./util":66,"h5.buffers":77}],56:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -10626,7 +10718,7 @@ WriteMultipleCoilsResponse.prototype.getQuantity = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3}],56:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3}],57:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -10801,7 +10893,7 @@ WriteMultipleRegistersRequest.prototype.getValues = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Request":46,"./WriteMultipleRegistersResponse":57,"./util":65,"buffer":3}],57:[function(require,module,exports){
+},{"./Request":47,"./WriteMultipleRegistersResponse":58,"./util":66,"buffer":3}],58:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -10942,7 +11034,7 @@ WriteMultipleRegistersResponse.prototype.getQuantity = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3}],58:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3}],59:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -11113,7 +11205,7 @@ WriteObjectRequest.prototype.getValues = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Request":46,"./WriteObjectResponse":59,"./util":65,"buffer":3}],59:[function(require,module,exports){
+},{"./Request":47,"./WriteObjectResponse":60,"./util":66,"buffer":3}],60:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -11223,7 +11315,7 @@ WriteObjectResponse.prototype.getStatus = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3}],60:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3}],61:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -11379,7 +11471,7 @@ WriteSingleCoilRequest.prototype.getState = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Request":46,"./WriteSingleCoilResponse":61,"./util":65,"buffer":3}],61:[function(require,module,exports){
+},{"./Request":47,"./WriteSingleCoilResponse":62,"./util":66,"buffer":3}],62:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -11523,7 +11615,7 @@ WriteSingleCoilResponse.prototype.getState = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3}],62:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3}],63:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -11677,7 +11769,7 @@ WriteSingleRegisterRequest.prototype.getValue = function()
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./Request":46,"./WriteSingleRegisterResponse":63,"./util":65,"buffer":3}],63:[function(require,module,exports){
+},{"./Request":47,"./WriteSingleRegisterResponse":64,"./util":66,"buffer":3}],64:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -11821,7 +11913,7 @@ WriteSingleRegisterResponse.prototype.getValue = function()
 
 
 }).call(this,require("buffer").Buffer)
-},{"./Response":47,"./util":65,"buffer":3}],64:[function(require,module,exports){
+},{"./Response":48,"./util":66,"buffer":3}],65:[function(require,module,exports){
 'use strict';
 
 exports.ExceptionResponse = require('./ExceptionResponse');
@@ -11896,7 +11988,7 @@ exports[0x45] = exports.ReadMemoryRequest;
 exports[0x46] = exports.WriteMemoryRequest;
 exports[0x47] = exports.CommandRequest;
 
-},{"./CommandRequest":23,"./CommandResponse":24,"./ExceptionResponse":25,"./ReadCoilsRequest":26,"./ReadCoilsResponse":27,"./ReadDiagnosticsRequest":28,"./ReadDiagnosticsResponse":29,"./ReadDiscreteInputsRequest":30,"./ReadDiscreteInputsResponse":31,"./ReadFifo8Request":32,"./ReadFifo8Response":33,"./ReadFileRecordRequest":34,"./ReadFileRecordResponse":35,"./ReadHoldingRegistersRequest":36,"./ReadHoldingRegistersResponse":37,"./ReadInputRegistersRequest":38,"./ReadInputRegistersResponse":39,"./ReadMemoryRequest":40,"./ReadMemoryResponse":41,"./ReadObjectRequest":42,"./ReadObjectResponse":43,"./ReportSlaveIdRequest":44,"./ReportSlaveIdResponse":45,"./WriteFifo8Request":48,"./WriteFifo8Response":49,"./WriteFileRecordRequest":50,"./WriteFileRecordResponse":51,"./WriteMemoryRequest":52,"./WriteMemoryResponse":53,"./WriteMultipleCoilsRequest":54,"./WriteMultipleCoilsResponse":55,"./WriteMultipleRegistersRequest":56,"./WriteMultipleRegistersResponse":57,"./WriteObjectRequest":58,"./WriteObjectResponse":59,"./WriteSingleCoilRequest":60,"./WriteSingleCoilResponse":61,"./WriteSingleRegisterRequest":62,"./WriteSingleRegisterResponse":63}],65:[function(require,module,exports){
+},{"./CommandRequest":24,"./CommandResponse":25,"./ExceptionResponse":26,"./ReadCoilsRequest":27,"./ReadCoilsResponse":28,"./ReadDiagnosticsRequest":29,"./ReadDiagnosticsResponse":30,"./ReadDiscreteInputsRequest":31,"./ReadDiscreteInputsResponse":32,"./ReadFifo8Request":33,"./ReadFifo8Response":34,"./ReadFileRecordRequest":35,"./ReadFileRecordResponse":36,"./ReadHoldingRegistersRequest":37,"./ReadHoldingRegistersResponse":38,"./ReadInputRegistersRequest":39,"./ReadInputRegistersResponse":40,"./ReadMemoryRequest":41,"./ReadMemoryResponse":42,"./ReadObjectRequest":43,"./ReadObjectResponse":44,"./ReportSlaveIdRequest":45,"./ReportSlaveIdResponse":46,"./WriteFifo8Request":49,"./WriteFifo8Response":50,"./WriteFileRecordRequest":51,"./WriteFileRecordResponse":52,"./WriteMemoryRequest":53,"./WriteMemoryResponse":54,"./WriteMultipleCoilsRequest":55,"./WriteMultipleCoilsResponse":56,"./WriteMultipleRegistersRequest":57,"./WriteMultipleRegistersResponse":58,"./WriteObjectRequest":59,"./WriteObjectResponse":60,"./WriteSingleCoilRequest":61,"./WriteSingleCoilResponse":62,"./WriteSingleRegisterRequest":63,"./WriteSingleRegisterResponse":64}],66:[function(require,module,exports){
 /*jshint maxparams:5*/
 
 'use strict';
@@ -12013,7 +12105,7 @@ function prepareNumericOption(value, defaultValue, min, max, label)
   return value;
 }
 
-},{"util":9}],66:[function(require,module,exports){
+},{"util":9}],67:[function(require,module,exports){
 'use strict';
 
 var Master = require('./Master');
@@ -12045,6 +12137,10 @@ var connectionFactories = {
   {
     return new (require('./connections/BleConnection'))(options.device);
   },
+  'generic': function createGenericConnection(options)
+  {
+    return new (require('./connections/GenericConnection'))(options.device);
+  },
   'none': function createNoConnection(options)
   {
     return new (require('./connections/NoConnection'))(options);
@@ -12060,6 +12156,12 @@ var transportFactories = {
   'ip': function createIpTransport(options)
   {
     return new (require('./transports/IpTransport'))(
+      createConnection(options.connection)
+    );
+  },
+  'socketcand': function createSocketcandTransport(options)
+  {
+    return new (require('./transports/SocketcandTransport'))(
       createConnection(options.connection)
     );
   },
@@ -12172,7 +12274,7 @@ module.exports = {
   Register: require('./Register')
 };
 
-},{"./Master":11,"./Register":13,"./connections/BleConnection":16,"./connections/NoConnection":17,"./connections/SerialConnection":18,"./connections/TcpConnection":19,"./connections/UdpConnection":20,"./connections/WebsocketConnection":21,"./functions":64,"./transports/AsciiTransport":67,"./transports/IpTransport":68,"./transports/RtuTransport":69,"./transports/TunnelTransport":70}],67:[function(require,module,exports){
+},{"./Master":11,"./Register":13,"./connections/BleConnection":16,"./connections/GenericConnection":17,"./connections/NoConnection":18,"./connections/SerialConnection":19,"./connections/TcpConnection":20,"./connections/UdpConnection":21,"./connections/WebsocketConnection":22,"./functions":65,"./transports/AsciiTransport":68,"./transports/IpTransport":69,"./transports/RtuTransport":70,"./transports/SocketcandTransport":71,"./transports/TunnelTransport":72}],68:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -12584,7 +12686,7 @@ AsciiTransport.prototype.validate =
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../Transport":15,"../errors":22,"buffer":3,"h5.buffers":75,"util":9}],68:[function(require,module,exports){
+},{"../Transport":15,"../errors":23,"buffer":3,"h5.buffers":77,"util":9}],69:[function(require,module,exports){
 'use strict';
 
 var util = require('util');
@@ -12926,7 +13028,7 @@ IpTransport.prototype.skipResponseData = function()
   this.header.reset();
 };
 
-},{"../Transport":15,"../errors":22,"h5.buffers":75,"util":9}],69:[function(require,module,exports){
+},{"../Transport":15,"../errors":23,"h5.buffers":77,"util":9}],70:[function(require,module,exports){
 'use strict';
 
 var util = require('util');
@@ -13316,7 +13418,572 @@ RtuTransport.prototype.validate =
   return null;
 };
 
-},{"../Transport":15,"../errors":22,"h5.buffers":75,"util":9}],70:[function(require,module,exports){
+},{"../Transport":15,"../errors":23,"h5.buffers":77,"util":9}],71:[function(require,module,exports){
+(function (Buffer){
+'use strict';
+
+var util = require('util');
+var buffers = require('h5.buffers');
+var Transport = require('../Transport');
+var InvalidResponseDataError = require('../errors').InvalidResponseDataError;
+
+module.exports = SocketcandTransport;
+
+/**
+ * @constructor
+ * @extends {Transport}
+ * @param {Connection} connection
+ * @event request Emitted right before the ADU is passed to the underlying
+ * `Connection`.
+ */
+function SocketcandTransport(connection)
+{
+  Transport.call(this, connection);
+
+  /**
+   * @type {h5.buffers.BufferQueueReader}
+   */
+  this.reader = new buffers.BufferQueueReader();
+
+  /**
+   * @type {SocketcandTransport.Header}
+   */
+  this.header = new SocketcandTransport.Header();
+
+  /**
+   * @private
+   * @type {number}
+   */
+  this.nextTransactionId = 0;
+
+  // this is hardcoded for now...
+  this.myCanId = 1;
+
+  /**
+   * @private
+   * @type {object.<number, Transaction>}
+   */
+  this.transactions = {};
+
+  this.connection.on('data', this.onData.bind(this));
+}
+
+util.inherits(SocketcandTransport, Transport);
+
+/**
+ * @constructor
+ */
+SocketcandTransport.Header = function()
+{
+  /**
+   * @type {number}
+   */
+  this.id = -1;
+
+  /**
+   * @type {number}
+   */
+  this.version = -1;
+
+  /**
+   * @type {number}
+   */
+  this.length = -1;
+
+  /**
+   * @type {number}
+   */
+  this.unit = -1;
+};
+
+/**
+ * @param {h5.buffers.BufferQueueReader} bufferReader
+ */
+SocketcandTransport.Header.prototype.read = function(bufferReader)
+{
+  this.id = bufferReader.shiftUInt16();
+  this.version = bufferReader.shiftUInt16();
+  this.length = bufferReader.shiftUInt16() - 1;
+  this.unit = bufferReader.shiftByte();
+};
+
+/**
+ * @param {Transaction} transaction
+ * @returns {InvalidResponseDataError|null}
+ */
+SocketcandTransport.Header.prototype.validate = function(transaction)
+{
+  var message;
+  var expectedUnit = transaction.getUnit();
+
+  if (this.version !== 0)
+  {
+    message = util.format(
+      "Invalid version specified in the MODBUS response header. "
+        + "Expected: 0, got: %d",
+      this.version
+    );
+  }
+  else if (this.length === 0)
+  {
+    message = "Invalid length specified in the MODBUS response header. "
+      + "Expected: at least 1, got: 0.";
+  }
+  else if (this.unit !== expectedUnit)
+  {
+    message = util.format(
+      "Invalid unit specified in the MODBUS response header. "
+        + "Expected: %d, got: %d.",
+      expectedUnit,
+      this.unit
+    );
+  }
+
+  return typeof message === 'undefined'
+    ? null
+    : new InvalidResponseDataError(message);
+};
+
+SocketcandTransport.Header.prototype.reset = function()
+{
+  this.id = -1;
+  this.version = -1;
+  this.length = -1;
+  this.unit = -1;
+};
+
+SocketcandTransport.prototype.destroy = function()
+{
+  this.removeAllListeners();
+
+  if (this.connection !== null)
+  {
+    this.connection.destroy();
+    this.connection = null;
+  }
+
+  if (this.transactions !== null)
+  {
+    Object.keys(this.transactions).forEach(function(id)
+    {
+      this.transactions[id].transaction.destroy();
+    }, this);
+
+    this.transactions = {};
+  }
+};
+
+/**
+ * @param {Transaction} transaction
+ */
+SocketcandTransport.prototype.sendRequest = function(transaction)
+{
+  //console.log( this.transactions[ transaction.unit ]  );
+
+  if ( this.transactions[ transaction.unit ] )
+  {
+    throw new Error(
+      "Can only start one transaction per slave with this transport type "
+    );
+  }
+
+  this.transactions[ transaction.unit ] = this.getAdu(transaction);
+
+  // if adu is null we should abort somehow
+
+
+  this.emit('request', transaction);
+
+  this.sendNextChunk( this.transactions[ transaction.unit ] );
+
+  // set the overall timer
+  transaction.start(this.createTimeoutHandler( transaction.unit ));
+};
+
+/**
+ * 
+ */
+SocketcandTransport.prototype.sendNextChunk = function( obj ) {
+
+  //console.log( 'chunk: ', obj.chunks[0] );
+  this.connection.write( obj.chunks[0] );
+
+  obj.chunkTimer = setTimeout( 
+    this.createChunkTimeoutHandler( obj.transaction.unit ), 
+    1000 );
+};
+
+
+/**
+ * @private
+ * @param {number} id
+ * @param {Transaction} transaction
+ * @returns {Buffer}
+ */
+SocketcandTransport.prototype.getAdu = function(transaction)
+{
+  var adu = transaction.getAdu();
+
+  var request = transaction.getRequest();
+
+    //console.log( 'REQUEST: ', request );
+
+
+  if (adu === null)
+  {
+    switch( request.code ) {
+      
+      // Read memory
+      case 0x45:
+        adu = this.buildAduReadMemory( transaction );
+        break;
+
+      // Write memory
+      case 0x46:
+        adu = this.buildAduWriteMemory( transaction );
+        break;
+
+      default:
+        transaction.handleError(
+          new Error( 'Function not supported by socketcand transport'));
+        break;
+    }
+
+    //adu = this.buildAdu( transaction);
+
+    transaction.setAdu( adu );
+  }
+
+  return {
+    transaction: transaction,
+    chunks: adu,
+    response: [ request.code ]
+  };
+
+};
+
+
+
+/**
+ * @private
+ * @param {number} id
+ * @param {Transaction} transaction
+ * @returns {Buffer}
+ */
+SocketcandTransport.prototype.buildAduReadMemory = function( transaction )
+{
+  var chunks = [];
+
+  var request = transaction.getRequest();
+  var bank = (request.address >> 8) & 0xff;  
+  var address = request.address & 0xFF;
+
+  var command, opcode;
+
+  // banks 0-3 are motor controller memory
+  if( bank >= 0 && bank <=3 ) {
+    command = 0x48;
+
+    if( bank === 0 ) {
+      opcode = 0x05;
+    }
+    else if( bank === 1 ) {
+      opcode = 0x07;
+    }
+    else{
+      opcode = 0xA0;
+    }
+
+  }
+  else {
+    command = 0x49;
+  }
+
+
+  for( var i = 0; i < request.count; i++ ) {
+    chunks.push( [
+      transaction.unit, 
+      this.myCanId, 
+      command, 
+      opcode, 
+      address + i
+    ]);
+  }
+
+  //console.log( 'Chunks: ', chunks.length );
+
+  return chunks;
+
+};
+
+
+/**
+ * @private
+ * @param {number} id
+ * @param {Transaction} transaction
+ * @returns {Buffer}
+ */
+SocketcandTransport.prototype.buildAduWriteMemory = function( transaction )
+{
+  var chunks = [];
+
+  var request = transaction.getRequest();
+  var bank = (request.address >> 8) & 0xff;  
+  var address = request.address & 0xFF;
+
+  var command, opcode;
+
+  // banks 0-3 are motor controller memory
+  if( bank >= 0 && bank <=3 ) {
+    command = 0x48;
+
+    if( bank === 0 ) {
+      opcode = 0x04;
+    }
+    else if( bank === 1 ) {
+      opcode = 0x06;
+    }
+    else{
+      opcode = 0xB0;
+    }
+
+  }
+  else {
+    command = 0x49;
+  }
+
+  var data = request.getValues();
+
+  for( var i = 0; i < request.getCount(); i++ ) {
+    chunks.push( [
+      transaction.unit, 
+      this.myCanId, 
+      command, 
+      opcode, 
+      address + i,
+      data[i]
+    ]);
+  }
+
+  //console.log( 'Chunks: ', chunks.length );
+
+  return chunks;
+
+};
+
+/**
+ * @private
+ * @param {number} id
+ * @returns {function}
+ */
+SocketcandTransport.prototype.createTimeoutHandler = function(id)
+{
+  var transactions = this.transactions;
+
+  return function()
+  {
+    if (typeof transactions[id] !== 'undefined')
+    {
+      delete transactions[id];
+    }
+  };
+};
+
+/**
+ * @private
+ * @param {number} id
+ * @returns {function}
+ */
+SocketcandTransport.prototype.createChunkTimeoutHandler = function(id)
+{
+  var me = this;
+
+  // this is a timeout handler that retries sending the chunk.
+
+  return function()
+  {
+    if ( me.transactions[id] && 
+      typeof me.transactions[id] !== 'undefined' &&
+      me.transactions[id].chunks.length > 0)
+    {
+      me.sendNextChunk( me.transactions[id ]);
+    }
+  };
+};
+/**
+ * @private
+ * @param {Buffer} [data]
+ */
+SocketcandTransport.prototype.onData = function(data)
+{
+  var me = this;
+
+  //console.log( 'Data: ', data );
+
+  if( data.length > 4 ) {
+    // data is 'to', 'from', .... bytes
+    var to = data.shift();
+    var from = data.shift();
+    var cmd = data.shift();
+    var op = data.shift();
+    var address = data.shift();
+    var value = data.shift();
+
+    if( this.transactions[from] && 
+      this.transactions[from].chunks &&
+      this.transactions[from].chunks.length > 0){
+
+      var transaction = this.transactions[from].transaction;
+      var chunk = this.transactions[from].chunks[0];
+
+      var request = transaction.getRequest();
+      var response = this.transactions[from].response;
+
+      if( to === this.myCanId && 
+        cmd === chunk[2] && 
+        op === chunk[3] && 
+        (address- (request.address & 0xFF)) === (response.length-1)) {
+
+        //console.log( 'Value ', value );
+
+        // this appears to be the data we are looking for
+        if( request.code === 0x45 ) {
+          response.push( value );
+        }
+
+        if( this.transactions[from].chunkTimer ) {
+          clearTimeout( this.transactions[from].chunkTimer );
+          this.transactions[from].chunkTimer = null;
+        }
+
+        this.transactions[from].chunks.shift();
+
+        if( this.transactions[from].chunks.length ) {
+
+
+          me.sendNextChunk( me.transactions[from ] );
+        }
+        else {
+          //console.log( 'RESPONSE: ', response );
+          // when we think we have a complete response, try processing it
+
+          if( request.code === 0x46 ) {
+            //success
+            response.push( 0 );
+          }
+
+          try{
+            transaction.handleResponse(request.createResponse(new Buffer(response)));
+          }
+          catch (error) {
+            transaction.handleError(error);
+          }
+
+          delete this.transactions[ from ]; 
+
+        }
+
+      }
+
+
+    }
+
+  }
+
+/*
+    // when we think we have a complete response, try processing it
+    try
+    {
+      transaction.handleResponse(request.createResponse(responseBuffer));
+    }
+    catch (error)
+    {
+      transaction.handleError(error);
+    }
+
+
+  }
+
+  if (typeof data !== 'undefined')
+  {
+    this.reader.push(data);
+  }
+
+  if (this.header.id === -1 && this.reader.length >= 7)
+  {
+    this.header.read(this.reader);
+  }
+
+  if (this.header.id !== -1 && this.reader.length >= this.header.length)
+  {
+    this.handleFrameData();
+  }
+  */
+};
+
+/**
+ * @private
+ */
+SocketcandTransport.prototype.handleFrameData = function()
+{
+  var transaction = this.transactions[this.header.id];
+
+  if (typeof transaction === 'undefined')
+  {
+    this.skipResponseData();
+    this.onData();
+
+    return;
+  }
+
+  delete this.transactions[this.header.id];
+
+  var validationError = this.header.validate(transaction);
+
+  if (validationError !== null)
+  {
+    this.skipResponseData();
+
+    transaction.handleError(validationError);
+
+    this.onData();
+
+    return;
+  }
+
+  var responseBuffer = this.reader.shiftBuffer(this.header.length);
+
+  this.header.reset();
+
+  var request = transaction.getRequest();
+
+  try
+  {
+    transaction.handleResponse(request.createResponse(responseBuffer));
+  }
+  catch (error)
+  {
+    transaction.handleError(error);
+  }
+
+  this.onData();
+};
+
+/**
+ * @private
+ */
+SocketcandTransport.prototype.skipResponseData = function()
+{
+  if (this.header.length > 0)
+  {
+    this.reader.skip(this.header.length);
+  }
+
+  this.header.reset();
+};
+
+}).call(this,require("buffer").Buffer)
+},{"../Transport":15,"../errors":23,"buffer":3,"h5.buffers":77,"util":9}],72:[function(require,module,exports){
 (function (Buffer){
 /**
  * Implements a custom transport that allows us to behave like a slave but
@@ -13352,7 +14019,7 @@ module.exports = TunnelTransport;
  * @const
  * @type {number}
  */
-var SLAVE_COMMAND = 71;
+var SLAVE_COMMAND = 0x48;
 
 /**
  * @private
@@ -13569,7 +14236,7 @@ TunnelTransport.prototype.startTransaction = function()
 
     this.transaction.start(this.handleTimeout);
   }
-}
+};
 
 /**
  * Launches the response to the SLAVE_COMMAND function code
@@ -13643,7 +14310,8 @@ TunnelTransport.prototype.buildAdu = function(transaction)
   }
   else
   {
-    adu = this.frame( this.options.slaveId, new Buffer([SLAVE_COMMAND, this.sequence]));
+    adu = this.frame( this.options.slaveId, 
+      new Buffer([SLAVE_COMMAND, this.sequence]));
   }
   return adu;
 };
@@ -13783,7 +14451,6 @@ TunnelTransport.prototype.handleFrameData = function()
   this.flushReader();
 
   var validationError = this.validate(
-    transaction,
     unit,
     responseBuffer,
     checksum
@@ -13835,12 +14502,10 @@ TunnelTransport.prototype.handleFrameData = function()
 
           var request = transaction.getRequest();
 
-          try
-          {
+          try {
             transaction.handleResponse(request.createResponse(responseBuffer.slice(3)));
           }
-          catch (error)
-          {
+          catch (error){
             transaction.handleError(error);
           }
 
@@ -13849,8 +14514,7 @@ TunnelTransport.prototype.handleFrameData = function()
 
         }
       }
-      else
-      {
+      else {
         // sequence number is wrong.  Ignore the PDU-T, if any
         //console.log('Out-of-sequence SLAVE_COMMAND');
 
@@ -13880,7 +14544,7 @@ TunnelTransport.prototype.handleFrameData = function()
  * @returns {Error|null}
  */
 TunnelTransport.prototype.validate =
-  function(transaction, actualUnit, responseBuffer, expectedChecksum)
+  function( actualUnit, responseBuffer, expectedChecksum)
 {
   var actualChecksum = this.crc16(actualUnit, responseBuffer);
 
@@ -13894,7 +14558,7 @@ TunnelTransport.prototype.validate =
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../Transport":15,"../errors":22,"buffer":3,"h5.buffers":75,"util":9}],71:[function(require,module,exports){
+},{"../Transport":15,"../errors":23,"buffer":3,"h5.buffers":77,"util":9}],73:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -14528,7 +15192,7 @@ function parseFloatValue(value, max, min)
 module.exports = BufferBuilder;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":3}],72:[function(require,module,exports){
+},{"buffer":3}],74:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -15693,7 +16357,7 @@ function toInt32(uInt32)
 module.exports = BufferQueueReader;
 
 }).call(this,require("buffer").Buffer)
-},{"./helpers":74,"buffer":3}],73:[function(require,module,exports){
+},{"./helpers":76,"buffer":3}],75:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -16564,7 +17228,7 @@ BufferReader.prototype.readDouble = function(offset, littleEndian)
 module.exports = BufferReader;
 
 }).call(this,require("buffer").Buffer)
-},{"./helpers":74,"buffer":3}],74:[function(require,module,exports){
+},{"./helpers":76,"buffer":3}],76:[function(require,module,exports){
 'use strict';
 
 /**
@@ -16596,10 +17260,10 @@ exports.toBits = function(byteArray, bitCount)
   return bitArray;
 };
 
-},{}],75:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 exports.BufferQueueReader = require('./BufferQueueReader');
 exports.BufferReader = require('./BufferReader');
 exports.BufferBuilder = require('./BufferBuilder');
 
-},{"./BufferBuilder":71,"./BufferQueueReader":72,"./BufferReader":73}]},{},[66])(66)
+},{"./BufferBuilder":73,"./BufferQueueReader":74,"./BufferReader":75}]},{},[67])(67)
 });

@@ -12,10 +12,11 @@
   "maxdepth": 4,
   "maxparams": 4,
   "maxstatements": 20,
-  "maxlen": 80,
+  "maxlen": 160,
   "es5": true,
   "laxbreak": true,
   "node": true,
+  "mocha": true,
   "globalstrict": true,
   "white": false
 }

@@ -23,7 +23,7 @@ var sinon = require('sinon');
 var config = require('../../config');
 
 // Module which manages the serial port
-var serialPortFactory = require('serialport');
+var SerialPortFactory = require('serialport');
 
 // Load the object that handles MODBUS formatting
 var MbPort = require('../../lib/index');
@@ -41,7 +41,7 @@ config.port.options.baudrate = process.env.MODBUS_BAUDRATE ||
 
 
 // Open the serial port we are going to use
-var port = new serialPortFactory.SerialPort(
+var port = new SerialPortFactory(
       config.port.name,
       config.port.options,
       false );
@@ -141,7 +141,7 @@ describe('Read Device', function() {
     master.reportSlaveId( function( err, response ) {
 
       expect( err ).to.equal(null);
-
+      expect( response ).to.be.an('object');
 
       setTimeout( done, 5000 );
     });

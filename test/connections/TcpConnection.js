@@ -4,9 +4,9 @@
 
 require('should');
 
-var LIB_DIR = process.env.LIB_FOR_TESTS_DIR || '../../lib';
+//var LIB_DIR = process.env.LIB_FOR_TESTS_DIR || '../../lib';
 
-var TcpConnection = require(LIB_DIR + '/connections/TcpConnection');
+//var TcpConnection = require(LIB_DIR + '/connections/TcpConnection');
 
 describe("TcpConnection", function()
 {

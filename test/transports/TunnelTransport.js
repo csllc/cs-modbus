@@ -11,11 +11,11 @@
 'use strict';
 
 var expect = require('chai').expect;
-require('should');
+var should = require('chai').should;
 var util = require('util');
 
 var LIB_DIR = (process.env.LIB_FOR_TESTS_DIR || '../../lib');
-var TunnelTransport = require(LIB_DIR + '/transports/TunnelTransport');
+//var TunnelTransport = require(LIB_DIR + '/transports/TunnelTransport');
 var Connection = require(LIB_DIR + '/Connection');
 var MB = require(LIB_DIR +'/index');
 
@@ -34,7 +34,7 @@ function MockConnection()
   Connection.call(this);
 
   this.sequence = 1;
-  this.responsePdu_t = Buffer(0);
+  this.responsePdu_t = new Buffer(0);
 
   // which device to poll..
   this.pollDevice = 127;
@@ -47,9 +47,9 @@ function MockConnection()
   var NoConnection = require(LIB_DIR + '/connections/NoConnection');
 
   // Use an instance of RTU transport for mocking the remote end of the link
-  this.builder = new RtuTransport({connection: new NoConnection });
+  this.builder = new RtuTransport({connection: new NoConnection() });
 
-  this.lastSentData = Buffer(0);
+  this.lastSentData = new Buffer(0);
 
 }
 
@@ -116,21 +116,14 @@ MockConnection.prototype.write = function(data)
       //console.log('checksum matches!');
 
       if( fc === SLAVE_COMMAND ) {
+        
         var seq = data[2];
         //console.log('seq:', seq);
 
-        if( this.sequence === seq ) {
-          // do nothing, perhaps lost message, don't trash the response PDU-T.
-          // there is a special case if the slave and master just happen to have the
-          // same sequence number when they initially communicate.  In this case,
-          // we will send back an empty reponse, which the slave will ignore. When we
-          // poll again, we will actually respond.
-
-        }
-        else {
+        if( this.sequence !== seq ) {
           // new sequence number, can ditch the last response PDU-T
           this.sequence = seq;
-          this.responsePdu_t = Buffer(0);
+          this.responsePdu_t = new Buffer(0);
 
           // if there is a new PDU-T in the incoming message, process it and save it to send in the next poll
           var requestPdu = data.slice(3, -2);
@@ -147,6 +140,14 @@ MockConnection.prototype.write = function(data)
           }
 
         }
+          // ELSE do nothing, perhaps lost message, don't trash the response PDU-T.
+          // there is a special case if the slave and master just happen to have the
+          // same sequence number when they initially communicate.  In this case,
+          // we will send back an empty reponse, which the slave will ignore. When we
+          // poll again, we will actually respond.
+
+        
+
       }
 
     }
@@ -185,7 +186,7 @@ MockConnection.prototype.stopPoll = function()
     clearTimeout( this.timer );
   }
 
-}
+};
 
 /**
  * Simulates the remote master's poll message
@@ -307,6 +308,8 @@ describe("TunnelTransport", function()
       master.reportSlaveId();
       master.reportSlaveId();
     }
+    test1();
+    test2();
 
   });
 

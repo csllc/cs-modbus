@@ -7,7 +7,7 @@ require('should');
 
 var LIB_DIR = process.env.LIB_FOR_TESTS_DIR || '../../lib';
 
-var response = require(LIB_DIR + '/functions/ReportSlaveIdResponse');
+var Response = require(LIB_DIR + '/functions/ReportSlaveIdResponse');
 
 describe("ReportSlaveIdResponse", function()
 {
@@ -15,12 +15,12 @@ describe("ReportSlaveIdResponse", function()
   {
     function testEmpty()
     {
-      new response(new Buffer(0));
+      new Response(new Buffer(0));
     }
 
     function testTooLong()
     {
-      new response(new Buffer(8));
+      new Response(new Buffer(8));
     }
 
 
@@ -32,12 +32,12 @@ describe("ReportSlaveIdResponse", function()
   {
     function test1()
     {
-      new response(-1,0,'1.1.1');
+      new Response(-1,0,'1.1.1');
     }
 
     function test2()
     {
-      new response(256,0,'1.1.1');
+      new Response(256,0,'1.1.1');
     }
 
     test1.should.throw();
@@ -48,12 +48,12 @@ describe("ReportSlaveIdResponse", function()
   {
     function test1()
     {
-      new response(0, -1,'1.1.1');
+      new Response(0, -1,'1.1.1');
     }
 
     function test2()
     {
-      new response(0, 256,'1.1.1');
+      new Response(0, 256,'1.1.1');
     }
 
     test1.should.throw();
@@ -64,12 +64,12 @@ describe("ReportSlaveIdResponse", function()
   {
     function test1()
     {
-      new response(0, 0,'11.1');
+      new Response(0, 0,'11.1');
     }
 
     function test2()
     {
-      new response(0, 0,'1.1.1.1');
+      new Response(0, 0,'1.1.1.1');
     }
 
     test1.should.throw();
@@ -80,7 +80,7 @@ describe("ReportSlaveIdResponse", function()
   {
     it("should return a valid function code", function()
     {
-      response.fromBuffer(new Buffer([0x11, 0x05, 0x03, 0xFF,
+      Response.fromBuffer(new Buffer([0x11, 0x05, 0x03, 0xFF,
         0x04, 0x05, 0x06])).getCode().should.be.equal(0x11);
     });
   });
@@ -89,7 +89,7 @@ describe("ReportSlaveIdResponse", function()
   {
     it("should create an instance from the specified options object", function()
     {
-      var res = response.fromOptions({
+      var res = Response.fromOptions({
         product: 0x01,
         run: 0xFF,
         version: '004.005.006'
@@ -105,12 +105,12 @@ describe("ReportSlaveIdResponse", function()
     {
       function test1()
       {
-        response.fromBuffer(new Buffer([]));
+        Response.fromBuffer(new Buffer([]));
       }
 
       function test2()
       {
-        response.fromBuffer(new Buffer([0x04, 0x02, 0x00, 0x00, 0x00, 0x00]));
+        Response.fromBuffer(new Buffer([0x04, 0x02, 0x00, 0x00, 0x00, 0x00]));
       }
 
       test1.should.throw();
@@ -121,7 +121,7 @@ describe("ReportSlaveIdResponse", function()
     {
       function test()
       {
-        response.fromBuffer(new Buffer([0x01, 0x00]));
+        Response.fromBuffer(new Buffer([0x01, 0x00]));
       }
 
       test.should.throw();
@@ -134,7 +134,7 @@ describe("ReportSlaveIdResponse", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      var res = response.fromBuffer(new Buffer([0x11, 0x05, 0x01, 0xFF, 0x03, 0x04, 0x05]));
+      var res = Response.fromBuffer(new Buffer([0x11, 0x05, 0x01, 0xFF, 0x03, 0x04, 0x05]));
       res.toBuffer()[0].should.be.equal(0x11);
     });
 
@@ -144,7 +144,7 @@ describe("ReportSlaveIdResponse", function()
   {
     it("should return a string", function()
     {
-      response.fromBuffer(new Buffer([0x11, 0x01, 0x05, 0xFF, 0x02, 0x02, 0x02])).toString().should.be.a('string');
+      Response.fromBuffer(new Buffer([0x11, 0x01, 0x05, 0xFF, 0x02, 0x02, 0x02])).toString().should.be.a('string');
     });
   });
 
@@ -152,7 +152,7 @@ describe("ReportSlaveIdResponse", function()
   {
     it("should return a string from Buffer specified in the constructor", function()
     {
-      var values = response.fromBuffer(new Buffer([0x11, 0x01, 0x05, 0xFF, 0x02, 0x20, 0xFF]))
+      var values = Response.fromBuffer(new Buffer([0x11, 0x01, 0x05, 0xFF, 0x02, 0x20, 0xFF]))
         .getVersion();
       values.should.be.eql('2.32.255');
     });

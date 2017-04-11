@@ -6,7 +6,7 @@
 'use strict';
 
 // Serial port interface
-var SerialPort = require('serialport').SerialPort;
+var SerialPort = require('serialport');
 
 // Modbus interface
 var modbus = require('../lib');
@@ -98,7 +98,7 @@ master.once('connected', function()
     title: 'Channel Map',
     addr: 0x01,
     length: 0x02,
-    format: function( value ) {
+    format: function(  ) {
       return 'channelMap format';
     }
   });
@@ -156,7 +156,7 @@ master.once('connected', function()
         powerOffSec: powerOffSec.format(),
         networkFormation: networkFormation.format(),
         pairingTimeout: pairingTimeout.format(),
-      }
+      };
     }
 
   });

@@ -4,7 +4,7 @@
 // from a MODBUS RTU slave connected through a serial port (all configuration
 // options are explicitly set to default values).
 
-var SerialPort = require('serialport').SerialPort;
+var SerialPort = require('serialport');
 var modbus = require('../lib');
 
 // See https://github.com/voodootikigod/node-serialport#to-use for a list

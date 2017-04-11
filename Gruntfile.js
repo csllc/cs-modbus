@@ -63,6 +63,25 @@ module.exports = function(grunt)
           text: true
         }
       }
+    },
+
+    browserify: {
+
+      options: {
+        //transform:  [ require('grunt-react').browserify ],
+        browserifyOptions: {
+          debug: true,
+          standalone: 'Modbus'
+        }
+      },
+      dev: {
+        src: './lib/index.js',
+        dest: './cs-modbus.js'
+      },
+      dist: {
+        src: './lib/index.js',
+        dest: './cs-modbus.js'
+      }
     }
   });
 
@@ -87,9 +106,14 @@ module.exports = function(grunt)
     'makeReport'
   ]);
 
+  grunt.registerTask('browserify', [
+    'browserify:main'
+  ]);
+
   grunt.registerTask('default', [
     'clean',
     'jshint',
-    'coverage'
+    'coverage',
+    'browserify'
   ]);
 };

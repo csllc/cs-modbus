@@ -4,9 +4,9 @@
 
 require('should');
 
-var Transaction = require(
-  (process.env.LIB_FOR_TESTS_DIR || '../lib') + '/Transaction'
-);
+//var Transaction = require(
+//  (process.env.LIB_FOR_TESTS_DIR || '../lib') + '/Transaction'
+//);
 
 describe("Transaction", function()
 {

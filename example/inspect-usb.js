@@ -5,7 +5,7 @@
 'use strict';
 
 // Serial port interface
-var SerialPort = require('serialport').SerialPort;
+var SerialPort = require('serialport');
 
 // Modbus interface
 var modbus = require('../lib');

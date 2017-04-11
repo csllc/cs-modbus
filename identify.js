@@ -18,7 +18,7 @@ var args = require('minimist')(process.argv.slice(2));
 var config = require('./config');
 
 // Module which manages the serial port
-var serialPortFactory = require('serialport');
+var SerialPortFactory = require('serialport');
 
 // Load the object that handles communication to the device
 var ModbusPort = require('./lib/index');
@@ -40,7 +40,7 @@ if( args.h ) {
 }
 
 // Retrieve a list of all the ports on the machine
-serialPortFactory.list(function (err, ports) {
+SerialPortFactory.list(function (err, ports) {
 
 ports = ports.slice(-2);
 console.log(ports);
@@ -48,8 +48,10 @@ console.log(ports);
 
   ports.forEach(function(port) {
     console.log('opening ' + port.comName, config.port.options );
-    var serialport = new serialPortFactory.SerialPort( 
-      port.comName, config.port.options, false);
+
+    config.port.options.autoOpen = false;
+    var serialport = new SerialPortFactory( 
+      port.comName, config.port.options);
 
     // Make serial port available for the modbus master
     config.master.transport.connection.serialPort = serialport;

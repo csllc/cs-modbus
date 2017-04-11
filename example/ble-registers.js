@@ -68,7 +68,7 @@ function runExample( device ) {
 
   device.on('connected', function() {
     console.log( '[device#connected]');
-  })
+  });
 
   master.on('connected', function()
   {
