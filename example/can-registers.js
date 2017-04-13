@@ -79,7 +79,7 @@ connection.on('write', function(data)
 // When the MODBUS master knows he is connected, we can send MODBUS commands
 master.once('connected', function()
 {
-  var t1 = master.readMemory( 0x0319, 1, {
+  var t1 = master.readMemory( 0x03BA, 1, {
     unit: 200,
 
     //timeout: 1000,
