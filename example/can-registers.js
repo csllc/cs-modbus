@@ -97,7 +97,7 @@ master.once('connected', function()
     }
   });
 
-  var t2 = master.writeMemory( 0x0319, [0x10], {
+  var t2 = master.writeMemory( 0x0319, [0x10 , 0x11], {
     unit: 200,
 
     //timeout: 1000,
