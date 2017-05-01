@@ -1,6 +1,6 @@
 {
   "name": "@csllc/cs-modbus",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Modbus TCP/ASCII/RTU master for Control Solutions products",
   "keywords": [
     "modbus",
@@ -26,7 +26,7 @@
     "test": "grunt --force"
   },
   "dependencies": {
-    "h5.buffers": "^0.1.1"  
+    "h5.buffers": "^0.1.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
