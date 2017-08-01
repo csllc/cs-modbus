@@ -70,12 +70,12 @@ connection.on('error', function(err)
 
 connection.on('write', function(data)
 {
-  console.log('[connection#write]', data);
+//  console.log('[connection#write]', data);
 });
 
 connection.on('data', function(data)
 {
-  console.log('[connection#data]', data);
+//  console.log('[connection#data]', data);
 });
 
 var transport = master.getTransport();
@@ -136,12 +136,12 @@ master.once('connected', function()
     timeout: 200 
   });
 
- 
+ */
   var t1 = master.readMemory(0x0300, 128, {
     unit: 0,
     maxRetries: 0,
     timeout: 128*20,
-    //interval: 100
+    interval: 500
   });
 
 
@@ -149,17 +149,18 @@ master.once('connected', function()
     unit: 0,
     maxRetries: 0,
     timeout: 128*20,
-    //interval: 100
+    interval: 500
   });
-*/
+
   //var t3 = master.writeMemory(0x0319, [ 0x16 ] );
 
   var t3 = master.reportSlaveId({ 
-    timeout: 200 
+    timeout: 200,
+    interval: 500
   });
 
-  //hookTransaction( t1 );
-  //hookTransaction( t2 );
+  hookTransaction( t1 );
+  hookTransaction( t2 );
   hookTransaction( t3 );
 
   setTimeout(
@@ -169,6 +170,6 @@ master.once('connected', function()
       //t2.cancel();
       master.destroy();
     },
-    5000
+    500000
   );
 });
