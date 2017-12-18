@@ -1,6 +1,6 @@
 {
   "name": "@csllc/cs-modbus",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Modbus TCP/ASCII/RTU master for Control Solutions products",
   "keywords": [
     "modbus",
