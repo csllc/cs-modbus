@@ -13,10 +13,9 @@
   "maxparams": 4,
   "maxstatements": 20,
   "maxlen": 160,
-  "es5": true,
+  "esversion": 6,
   "laxbreak": true,
   "node": true,
   "mocha": true,
-  "globalstrict": true,
   "white": false
 }
