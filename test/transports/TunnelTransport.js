@@ -10,8 +10,7 @@
 
 'use strict';
 
-var expect = require('chai').expect;
-var should = require('chai').should;
+var should = require('should');
 var util = require('util');
 
 var LIB_DIR = (process.env.LIB_FOR_TESTS_DIR || '../../lib');
@@ -20,7 +19,7 @@ var Connection = require(LIB_DIR + '/Connection');
 var MB = require(LIB_DIR +'/index');
 
 // The tunnel Function Code
-var SLAVE_COMMAND = 71;
+var SLAVE_COMMAND = 0x48;
 
 /**
  * Create a mock connection object so we don't have to actually have a remote device to do this test
@@ -110,15 +109,15 @@ MockConnection.prototype.write = function(data)
 
     var calcChecksum = this.builder.crc16(unit, responseBuffer);
 
-    //console.log('unit:', unit, responseBuffer, checksumbuf, checksum, calcChecksum );
+    // console.log('unit:', unit, responseBuffer, checksumbuf, checksum, calcChecksum );
 
     if( calcChecksum === checksum ) {
-      //console.log('checksum matches!');
+      // console.log('checksum matches!');
 
       if( fc === SLAVE_COMMAND ) {
         
         var seq = data[2];
-        //console.log('seq:', seq);
+        // console.log('seq:', seq);
 
         if( this.sequence !== seq ) {
           // new sequence number, can ditch the last response PDU-T
@@ -135,7 +134,7 @@ MockConnection.prototype.write = function(data)
               break;
 
             default:
-              console.log('Mock master didnt recognize function code ' + requestPdu[1]);
+              // console.log('Mock master didnt recognize function code ' + requestPdu[1]);
               break;
           }
 
@@ -251,9 +250,9 @@ beforeEach(function( done ) {
 });
 
 /**
- * Pre-test
+ * Post-test
  *
- * Runs once, before all tests in this block.
+ * Runs once, after all tests in this block.
  * Calling the done() callback tells mocha to proceed with tests
  *
  */
@@ -275,8 +274,8 @@ describe("TunnelTransport", function()
       connection.startPoll(100);
 
       master.reportSlaveId( function(err, response) {
-        expect(err).to.equal(null);
-        expect(response).to.be.an('object');
+        should.not.exist(err);
+        response.should.be.an.Object();
         done();
 
       });
@@ -285,9 +284,9 @@ describe("TunnelTransport", function()
   it("should timeout if master doesn't poll", function(done)
   {
       master.reportSlaveId( function(err, response) {
-        expect(response).to.equal(null);
-        expect(err).to.be.an('object');
-        expect(err.name).to.be.equal('ResponseTimeoutError');
+        should.not.exist(response);
+        err.should.be.an.Object();
+        err.name.should.be.equal('ResponseTimeoutError');
 
         done();
 
@@ -308,8 +307,8 @@ describe("TunnelTransport", function()
       master.reportSlaveId();
       master.reportSlaveId();
     }
-    test1();
-    test2();
+    test1.should.not.throw();
+    test2.should.throw();
 
   });
 
@@ -320,8 +319,8 @@ describe("TunnelTransport", function()
     connection.startPoll(100);
 
     master.reportSlaveId( function(err, response) {
-      expect(err).to.equal(null);
-      expect(response).to.be.an('object');
+      should.not.exist(err);
+      response.should.be.an.Object();
       count++;
       if( count === 2 ) {
         done();
@@ -329,8 +328,8 @@ describe("TunnelTransport", function()
     });
 
     master.reportSlaveId( function(err, response) {
-      expect(err).to.equal(null);
-      expect(response).to.be.an('object');
+      should.not.exist(err);
+      response.should.be.an.Object();
       count++;
       if( count === 2 ) {
         done();
@@ -350,8 +349,8 @@ describe("TunnelTransport", function()
 
     master.transport.on('sniff',function(type, buffer) {
       clearTimeout(errTimeout); //cancel error timeout
-      expect(type).to.equal('incomplete');
-      expect(buffer).to.deep.equal(testBuf);
+      type.should.be.equal('incomplete');
+      buffer.should.be.eql(testBuf);
       done();
 
     });
@@ -372,8 +371,8 @@ describe("TunnelTransport", function()
 
     master.transport.on('sniff',function(type, buffer) {
       clearTimeout(errTimeout); //cancel error timeout
-      expect(type).to.equal('bad checksum');
-      expect(buffer).to.deep.equal(testBuf);
+      type.should.be.equal('bad checksum');
+      buffer.should.be.eql(testBuf);
       done();
 
     });
@@ -393,8 +392,8 @@ describe("TunnelTransport", function()
 
     master.transport.on('sniff',function(type, buffer) {
       clearTimeout(errTimeout); //cancel error timeout
-      expect(type).to.equal('pdu');
-      expect(buffer).to.deep.equal(testBuf);
+      type.should.be.equal('pdu');
+      buffer.should.be.eql(testBuf);
       done();
 
     });
