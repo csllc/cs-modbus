@@ -18,17 +18,17 @@ describe("WriteMemoryRequest", function()
   {
     function testLessThanZero1()
     {
-      new WriteMemoryRequest( -1337, new Buffer(2));
+      new WriteMemoryRequest( -1337, Buffer.alloc(2));
     }
 
     function testLessThanZero2()
     {
-      new WriteMemoryRequest( -1, new Buffer(2));
+      new WriteMemoryRequest( -1, Buffer.alloc(2));
     }
 
     function testGreaterThanMax()
     {
-      new WriteMemoryRequest( 0x10000, new Buffer(2));
+      new WriteMemoryRequest( 0x10000, Buffer.alloc(2));
     }
 
     testLessThanZero1.should.throw();
@@ -40,17 +40,17 @@ describe("WriteMemoryRequest", function()
   {
     function testEmpty()
     {
-      new WriteMemoryRequest( 0, new Buffer(0));
+      new WriteMemoryRequest( 0, Buffer.alloc(0));
     }
 
     function testTooBig()
     {
-      new WriteMemoryRequest( 0, new Buffer(251));
+      new WriteMemoryRequest( 0, Buffer.alloc(251));
     }
 
     function testMax()
     {
-      new WriteMemoryRequest( 0, new Buffer(250));
+      new WriteMemoryRequest( 0, Buffer.alloc(250));
     }
 
     testEmpty.should.throw();
@@ -73,12 +73,12 @@ describe("WriteMemoryRequest", function()
     {
       var req = WriteMemoryRequest.fromOptions({
         address: 0x1234,
-        values: new Buffer([0x00, 0x10])
+        values: Buffer.from([0x00, 0x10])
       });
 
       req.getAddress().should.be.equal(0x1234);
       req.getCount().should.be.equal(2);
-      req.getValues().should.be.eql(new Buffer([0x00, 0x10]));
+      req.getValues().should.be.eql(Buffer.from([0x00, 0x10]));
     });
   });
 
@@ -88,12 +88,12 @@ describe("WriteMemoryRequest", function()
     {
       function test1()
       {
-        WriteMemoryRequest.fromBuffer(new Buffer([]));
+        WriteMemoryRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteMemoryRequest.fromBuffer(new Buffer([0x46, 0x12, 0x34]));
+        WriteMemoryRequest.fromBuffer(Buffer.from([0x46, 0x12, 0x34]));
       }
 
       test1.should.throw();
@@ -104,7 +104,7 @@ describe("WriteMemoryRequest", function()
     {
       function test()
       {
-        WriteMemoryRequest.fromBuffer(new Buffer([0x03, 0x00, 0x01, 0x02, 0x00, 0x01]));
+        WriteMemoryRequest.fromBuffer(Buffer.from([0x03, 0x00, 0x01, 0x02, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -112,7 +112,7 @@ describe("WriteMemoryRequest", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      var frame = new Buffer([0x46, 0x43, 0x21, 0x01, 0x00]);
+      var frame = Buffer.from([0x46, 0x43, 0x21, 0x01, 0x00]);
       var req = WriteMemoryRequest.fromBuffer(frame);
 
       req.getAddress().should.be.equal(0x4321);
@@ -120,10 +120,10 @@ describe("WriteMemoryRequest", function()
 
     it("should read bytes starting at 3 as Buffer", function()
     {
-      var frame = new Buffer([0x46, 0x43, 0x21, 0x00, 0x02]);
+      var frame = Buffer.from([0x46, 0x43, 0x21, 0x00, 0x02]);
       var req = WriteMemoryRequest.fromBuffer(frame);
 
-      req.getValues().should.be.eql(new Buffer([0x00, 0x02]));
+      req.getValues().should.be.eql(Buffer.from([0x00, 0x02]));
     });
   });
 
@@ -131,17 +131,17 @@ describe("WriteMemoryRequest", function()
   {
     it("should return a properly sized Buffer for 1 byte write", function()
     {
-      new WriteMemoryRequest(0x1234, new Buffer([0x00])).toBuffer().length.should.be.equal(4);
+      new WriteMemoryRequest(0x1234, Buffer.from([0x00])).toBuffer().length.should.be.equal(4);
     });
 
     it("should write the function code as uint8 at 0", function()
     {
-      new WriteMemoryRequest(0, new Buffer([0x00, 0x01])).toBuffer()[0].should.be.equal(0x46);
+      new WriteMemoryRequest(0, Buffer.from([0x00, 0x01])).toBuffer()[0].should.be.equal(0x46);
     });
 
     it("should write the values Buffer starting at 3", function()
     {
-      var req = new WriteMemoryRequest(0, new Buffer([0x13, 0x37]));
+      var req = new WriteMemoryRequest(0, Buffer.from([0x13, 0x37]));
       var buf = req.toBuffer();
 
       buf[3].should.be.eql(0x13);
@@ -153,7 +153,7 @@ describe("WriteMemoryRequest", function()
   {
     it("should return a string", function()
     {
-      new WriteMemoryRequest(0, new Buffer([0x00, 0x01])).toString().should.be.a.String();
+      new WriteMemoryRequest(0, Buffer.from([0x00, 0x01])).toString().should.be.a.String();
     });
   });
 
@@ -162,7 +162,7 @@ describe("WriteMemoryRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new WriteMemoryRequest(0, [0, 1]);
-      var res = req.createResponse(new Buffer([0xC6, 0x02]));
+      var res = req.createResponse(Buffer.from([0xC6, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x46);
@@ -171,8 +171,8 @@ describe("WriteMemoryRequest", function()
 
     it("should return an instance of WriteMemoryResponse if the function code is not an exception", function()
     {
-      var req = new WriteMemoryRequest(0, new Buffer([0x00, 0x01]));
-      var res = req.createResponse(new Buffer([0x46, 0x01]));
+      var req = new WriteMemoryRequest(0, Buffer.from([0x00, 0x01]));
+      var res = req.createResponse(Buffer.from([0x46, 0x01]));
 
       res.should.be.an.instanceOf(WriteMemoryResponse);
       res.getCode().should.be.equal(0x46);
@@ -184,7 +184,7 @@ describe("WriteMemoryRequest", function()
   {
     it("should return an address specified in the constructor", function()
     {
-      new WriteMemoryRequest(0xDEAD, new Buffer([0x00, 0x01])).getAddress().should.be.equal(0xDEAD);
+      new WriteMemoryRequest(0xDEAD, Buffer.from([0x00, 0x01])).getAddress().should.be.equal(0xDEAD);
     });
   });
 
@@ -192,7 +192,7 @@ describe("WriteMemoryRequest", function()
   {
     it("should return a values Buffer specified in the constructor", function()
     {
-      new WriteMemoryRequest(0, new Buffer([0x00, 0x01])).getValues().should.be.eql(new Buffer([0x00, 0x01]));
+      new WriteMemoryRequest(0, Buffer.from([0x00, 0x01])).getValues().should.be.eql(Buffer.from([0x00, 0x01]));
     });
   });
 });

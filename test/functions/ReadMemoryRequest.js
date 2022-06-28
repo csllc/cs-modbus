@@ -99,12 +99,12 @@ describe("ReadMemoryRequest", function()
     {
       function test1()
       {
-        ReadMemoryRequest.fromBuffer(new Buffer([]));
+        ReadMemoryRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ReadMemoryRequest.fromBuffer(new Buffer([0x03, 0x03 ]));
+        ReadMemoryRequest.fromBuffer(Buffer.from([0x03, 0x03 ]));
       }
 
       test1.should.throw();
@@ -115,7 +115,7 @@ describe("ReadMemoryRequest", function()
     {
       function test()
       {
-        ReadMemoryRequest.fromBuffer(new Buffer([0x02, 0x00]));
+        ReadMemoryRequest.fromBuffer(Buffer.from([0x02, 0x00]));
       }
 
       test.should.throw();
@@ -123,12 +123,12 @@ describe("ReadMemoryRequest", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      ReadMemoryRequest.fromBuffer(new Buffer([0x45, 0x10, 0x00, 10 ])).getAddress().should.be.equal(0x1000);
+      ReadMemoryRequest.fromBuffer(Buffer.from([0x45, 0x10, 0x00, 10 ])).getAddress().should.be.equal(0x1000);
     });
 
     it("should read uint8 at 3 as a count", function()
     {
-      ReadMemoryRequest.fromBuffer(new Buffer([0x45, 0x10, 0x00, 10 ])).getCount().should.be.equal(10);
+      ReadMemoryRequest.fromBuffer(Buffer.from([0x45, 0x10, 0x00, 10 ])).getCount().should.be.equal(10);
     });
 
   });
@@ -165,7 +165,7 @@ describe("ReadMemoryRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new ReadMemoryRequest(2);
-      var res = req.createResponse(new Buffer([0xC5, 0x22]));
+      var res = req.createResponse(Buffer.from([0xC5, 0x22]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x45);
@@ -175,7 +175,7 @@ describe("ReadMemoryRequest", function()
     it("should return an instance of ReadMemoryResponse if the function code is not an exception", function()
     {
       var req = new ReadMemoryRequest(2);
-      var res = req.createResponse(new Buffer([0x45, 0x11, 0x22, 0x33]));
+      var res = req.createResponse(Buffer.from([0x45, 0x11, 0x22, 0x33]));
 
       res.should.be.an.instanceOf(ReadMemoryResponse);
       res.getCode().should.be.equal(0x45);

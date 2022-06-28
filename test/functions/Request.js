@@ -77,7 +77,7 @@ describe("Request", function()
     {
       function test()
       {
-        new Request(0x01).createResponse(new Buffer(0));
+        new Request(0x01).createResponse(Buffer.alloc(0));
       }
 
       test.should.throw();

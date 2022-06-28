@@ -59,12 +59,12 @@ describe("WriteMemoryResponse", function()
     {
       function test1()
       {
-        WriteMemoryResponse.fromBuffer(new Buffer([]));
+        WriteMemoryResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteMemoryResponse.fromBuffer(new Buffer([0x46]));
+        WriteMemoryResponse.fromBuffer(Buffer.from([0x46]));
       }
 
       test1.should.throw();
@@ -75,7 +75,7 @@ describe("WriteMemoryResponse", function()
     {
       function test()
       {
-        WriteMemoryResponse.fromBuffer(new Buffer([0x03, 0x00, 0x00, 0x00, 0x01]));
+        WriteMemoryResponse.fromBuffer(Buffer.from([0x03, 0x00, 0x00, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -83,7 +83,7 @@ describe("WriteMemoryResponse", function()
 
     it("should read uint8 at 1 as a status", function()
     {
-      var frame = new Buffer([0x46, 0x12]);
+      var frame = Buffer.from([0x46, 0x12]);
       var req = WriteMemoryResponse.fromBuffer(frame);
 
       req.getStatus().should.be.equal(0x12);

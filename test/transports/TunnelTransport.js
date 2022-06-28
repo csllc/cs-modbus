@@ -34,7 +34,7 @@ function MockConnection()
   Connection.call(this);
 
   this.sequence = 1;
-  this.responsePdu_t = new Buffer(0);
+  this.responsePdu_t = Buffer.alloc(0);
 
   // which device to poll..
   this.pollDevice = 127;
@@ -49,7 +49,7 @@ function MockConnection()
   // Use an instance of RTU transport for mocking the remote end of the link
   this.builder = new RtuTransport({connection: new NoConnection() });
 
-  this.lastSentData = new Buffer(0);
+  this.lastSentData = Buffer.alloc(0);
 
 }
 
@@ -123,7 +123,7 @@ MockConnection.prototype.write = function(data)
         if( this.sequence !== seq ) {
           // new sequence number, can ditch the last response PDU-T
           this.sequence = seq;
-          this.responsePdu_t = new Buffer(0);
+          this.responsePdu_t = Buffer.alloc(0);
 
           // if there is a new PDU-T in the incoming message, process it and save it to send in the next poll
           var requestPdu = data.slice(3, -2);
@@ -131,7 +131,7 @@ MockConnection.prototype.write = function(data)
           // depending on the function code sent to us, make up a mock response
           switch( requestPdu[1] ) {
             case 0x11:
-              this.responsePdu_t = new Buffer( [0x01, 0x11, 0x00, 0x05,0xff,0x00,0x01,0x00]);
+              this.responsePdu_t = Buffer.from( [0x01, 0x11, 0x00, 0x05,0xff,0x00,0x01,0x00]);
               break;
 
             default:
@@ -200,7 +200,7 @@ MockConnection.prototype.doPoll = function()
   // Let all other events finish, then we will fire off this PDU
   process.nextTick(function() {
 
-    var buf = new Buffer([SLAVE_COMMAND, me.sequence ]);
+    var buf = Buffer.from([SLAVE_COMMAND, me.sequence ]);
     var message = me.builder.frame( me.pollDevice, Buffer.concat([buf, me.responsePdu_t ]));
 
     // emit the 'receive data' event that lets the TunnelTransport receive this message
@@ -346,7 +346,7 @@ describe("TunnelTransport", function()
       done();
     }, 200); //fail if event not received
 
-    var testBuf = new Buffer( [1,2,3]);
+    var testBuf = Buffer.from( [1,2,3]);
 
     master.transport.on('sniff',function(type, buffer) {
       clearTimeout(errTimeout); //cancel error timeout
@@ -368,7 +368,7 @@ describe("TunnelTransport", function()
       done();
     }, 200); //fail if event not received
 
-    var testBuf = new Buffer( [1,2,3,4]);
+    var testBuf = Buffer.from( [1,2,3,4]);
 
     master.transport.on('sniff',function(type, buffer) {
       clearTimeout(errTimeout); //cancel error timeout
@@ -389,7 +389,7 @@ describe("TunnelTransport", function()
       done();
     }, 200); //fail if event not received
 
-    var testBuf = new Buffer( [0x01, 0x11, 0xc0, 0x2c]);
+    var testBuf = Buffer.from( [0x01, 0x11, 0xc0, 0x2c]);
 
     master.transport.on('sniff',function(type, buffer) {
       clearTimeout(errTimeout); //cancel error timeout
