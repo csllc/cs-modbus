@@ -34,7 +34,7 @@ describe("ReportSlaveIdRequest", function()
   {
     it("should return a valid instance", function()
     {
-        ReportSlaveIdRequest.fromBuffer(new Buffer([0x11])).getCode().should.be.equal(0x11);
+        ReportSlaveIdRequest.fromBuffer(Buffer.from([0x11])).getCode().should.be.equal(0x11);
 
     });
 
@@ -42,12 +42,12 @@ describe("ReportSlaveIdRequest", function()
     {
       function test1()
       {
-        ReportSlaveIdRequest.fromBuffer(new Buffer([]));
+        ReportSlaveIdRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ReportSlaveIdRequest.fromBuffer(new Buffer([0x11, 0x00, 0x01, 0x00]));
+        ReportSlaveIdRequest.fromBuffer(Buffer.from([0x11, 0x00, 0x01, 0x00]));
       }
 
       test1.should.throw();
@@ -58,7 +58,7 @@ describe("ReportSlaveIdRequest", function()
     {
       function test()
       {
-        ReportSlaveIdRequest.fromBuffer(new Buffer([0x02]));
+        ReportSlaveIdRequest.fromBuffer(Buffer.from([0x02]));
       }
 
       test.should.throw();
@@ -84,7 +84,7 @@ describe("ReportSlaveIdRequest", function()
   {
     it("should return a string", function()
     {
-      new ReportSlaveIdRequest().toString().should.be.a('string');
+      new ReportSlaveIdRequest().toString().should.be.a.String();
     });
   });
 
@@ -93,7 +93,7 @@ describe("ReportSlaveIdRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new ReportSlaveIdRequest();
-      var res = req.createResponse(new Buffer([0x91, 0x03]));
+      var res = req.createResponse(Buffer.from([0x91, 0x03]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x11);
@@ -103,7 +103,7 @@ describe("ReportSlaveIdRequest", function()
     it("should return an instance of ReportSlaveIdResponse if the function code is not an exception", function()
     {
       var req = new ReportSlaveIdRequest();
-      var res = req.createResponse(new Buffer([0x11, 0x05, 0x02, 0x00, 0x01, 0x01, 0x01 ]));
+      var res = req.createResponse(Buffer.from([0x11, 0x05, 0x02, 0x00, 0x01, 0x01, 0x01 ]));
 
       res.should.be.an.instanceOf(ReportSlaveIdResponse);
       res.getCode().should.be.equal(0x11);

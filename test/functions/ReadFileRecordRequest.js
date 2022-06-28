@@ -156,12 +156,12 @@ describe("ReadFileRecordRequest", function()
     {
       function test1()
       {
-        ReadFileRecordRequest.fromBuffer(new Buffer([]));
+        ReadFileRecordRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ReadFileRecordRequest.fromBuffer(new Buffer([0x14, 0x02, 0x06, 0x00]));
+        ReadFileRecordRequest.fromBuffer(Buffer.from([0x14, 0x02, 0x06, 0x00]));
       }
 
       test1.should.throw();
@@ -172,7 +172,7 @@ describe("ReadFileRecordRequest", function()
     {
       function test()
       {
-        ReadFileRecordRequest.fromBuffer(new Buffer([0x02, 0x07, 0x06, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01]));
+        ReadFileRecordRequest.fromBuffer(Buffer.from([0x02, 0x07, 0x06, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -182,7 +182,7 @@ describe("ReadFileRecordRequest", function()
     {
       function test()
       {
-        ReadFileRecordRequest.fromBuffer(new Buffer([0x14, 0x07, 0xFF, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01]));
+        ReadFileRecordRequest.fromBuffer(Buffer.from([0x14, 0x07, 0xFF, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -190,7 +190,7 @@ describe("ReadFileRecordRequest", function()
 
     it("should read 7 bytes starting at 3 as a sub-request", function()
     {
-      var buffer = new Buffer([0x14, 0x07, 0x06, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01]);
+      var buffer = Buffer.from([0x14, 0x07, 0x06, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01]);
       var req = ReadFileRecordRequest.fromBuffer(buffer);
 
       req.getSubRequests().should.be.eql([{fileNumber: 1, recordNumber: 0, recordLength: 1}]);
@@ -198,7 +198,7 @@ describe("ReadFileRecordRequest", function()
 
     it("should read multiple sub-requests", function()
     {
-      var buffer = new Buffer([
+      var buffer = Buffer.from([
         0x14, 0x0E,
         0x06, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
         0x06, 0x00, 0x02, 0x00, 0x04, 0x00, 0x02
@@ -257,7 +257,7 @@ describe("ReadFileRecordRequest", function()
       ]);
       var buf = req.toBuffer();
 
-      buf.should.be.eql(new Buffer([
+      buf.should.be.eql(Buffer.from([
         0x14, 0x0E,
         0x06, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
         0x06, 0x00, 0x02, 0x00, 0x04, 0x00, 0x02
@@ -269,7 +269,7 @@ describe("ReadFileRecordRequest", function()
   {
     it("should return a string", function()
     {
-      new ReadFileRecordRequest([{}]).toString().should.be.a('string');
+      new ReadFileRecordRequest([{}]).toString().should.be.a.String();
     });
   });
 
@@ -278,7 +278,7 @@ describe("ReadFileRecordRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new ReadFileRecordRequest([{}]);
-      var res = req.createResponse(new Buffer([0x94, 0x02]));
+      var res = req.createResponse(Buffer.from([0x94, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x14);
@@ -291,7 +291,7 @@ describe("ReadFileRecordRequest", function()
         {fileNumber: 4, recordNumber: 1, recordLength: 2},
         {fileNumber: 3, recordNumber: 9, recordLength: 2}
       ]);
-      var res = req.createResponse(new Buffer([0x14, 0x0C, 0x05, 0x06, 0x0D, 0xFE, 0x00, 0x20, 0x05, 0x06, 0x33, 0xCD, 0x00, 0x40]));
+      var res = req.createResponse(Buffer.from([0x14, 0x0C, 0x05, 0x06, 0x0D, 0xFE, 0x00, 0x20, 0x05, 0x06, 0x33, 0xCD, 0x00, 0x40]));
 
       res.should.be.an.instanceOf(ReadFileRecordResponse);
       res.getCode().should.be.equal(0x14);

@@ -47,12 +47,12 @@ describe("ExceptionResponse", function()
     {
       function test1()
       {
-        ExceptionResponse.fromBuffer(new Buffer([]));
+        ExceptionResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ExceptionResponse.fromBuffer(new Buffer([0x81]));
+        ExceptionResponse.fromBuffer(Buffer.from([0x81]));
       }
 
       test1.should.throw();
@@ -63,17 +63,17 @@ describe("ExceptionResponse", function()
     {
       function test1()
       {
-        ExceptionResponse.fromBuffer(new Buffer([0x05, 0x00, 0x01]));
+        ExceptionResponse.fromBuffer(Buffer.from([0x05, 0x00, 0x01]));
       }
 
       function test2()
       {
-        ExceptionResponse.fromBuffer(new Buffer([0x79, 0x00, 0x01]));
+        ExceptionResponse.fromBuffer(Buffer.from([0x79, 0x00, 0x01]));
       }
 
       function test3()
       {
-        ExceptionResponse.fromBuffer(new Buffer([0x80, 0x00, 0x01]));
+        ExceptionResponse.fromBuffer(Buffer.from([0x80, 0x00, 0x01]));
       }
 
       test1.should.throw();
@@ -83,12 +83,12 @@ describe("ExceptionResponse", function()
 
     it("should use a value of the first byte minus 0x80 as a function code", function()
     {
-      ExceptionResponse.fromBuffer(new Buffer([0x81, 2])).getCode().should.be.equal(0x01);
+      ExceptionResponse.fromBuffer(Buffer.from([0x81, 2])).getCode().should.be.equal(0x01);
     });
 
     it("should use a value of the second byte as an exception code", function()
     {
-      ExceptionResponse.fromBuffer(new Buffer([0x81, 2])).getExceptionCode().should.be.equal(0x02);
+      ExceptionResponse.fromBuffer(Buffer.from([0x81, 2])).getExceptionCode().should.be.equal(0x02);
     });
   });
 
@@ -104,7 +104,7 @@ describe("ExceptionResponse", function()
   {
     it("should return a string", function()
     {
-      new ExceptionResponse(0x01, 2).toString().should.be.a('string');
+      new ExceptionResponse(0x01, 2).toString().should.be.a.String();
     });
 
     it("should include the function code", function()

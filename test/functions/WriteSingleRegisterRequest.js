@@ -73,12 +73,12 @@ describe("WriteSingleRegisterRequest", function()
     {
       function test1()
       {
-        WriteSingleRegisterRequest.fromBuffer(new Buffer([]));
+        WriteSingleRegisterRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteSingleRegisterRequest.fromBuffer(new Buffer([0x06, 0x00, 0x01, 0x00]));
+        WriteSingleRegisterRequest.fromBuffer(Buffer.from([0x06, 0x00, 0x01, 0x00]));
       }
 
       test1.should.throw();
@@ -89,7 +89,7 @@ describe("WriteSingleRegisterRequest", function()
     {
       function test()
       {
-        WriteSingleRegisterRequest.fromBuffer(new Buffer([0x03, 0x00, 0x00, 0x00, 0x01]));
+        WriteSingleRegisterRequest.fromBuffer(Buffer.from([0x03, 0x00, 0x00, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -97,7 +97,7 @@ describe("WriteSingleRegisterRequest", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      var frame = new Buffer([0x06, 0x12, 0x34, 0x00, 0x01]);
+      var frame = Buffer.from([0x06, 0x12, 0x34, 0x00, 0x01]);
       var req = WriteSingleRegisterRequest.fromBuffer(frame);
 
       req.getAddress().should.be.equal(0x1234);
@@ -105,7 +105,7 @@ describe("WriteSingleRegisterRequest", function()
 
     it("should read uint16 at 3 as a value", function()
     {
-      var frame = new Buffer([0x06, 0x12, 0x34, 0x13, 0x37]);
+      var frame = Buffer.from([0x06, 0x12, 0x34, 0x13, 0x37]);
       var req = WriteSingleRegisterRequest.fromBuffer(frame);
 
       req.getValue().should.be.equal(0x1337);
@@ -139,7 +139,7 @@ describe("WriteSingleRegisterRequest", function()
   {
     it("should return a string", function()
     {
-      new WriteSingleRegisterRequest(0x0001, 0x1337).toString().should.be.a('string');
+      new WriteSingleRegisterRequest(0x0001, 0x1337).toString().should.be.a.String();
     });
   });
 
@@ -148,7 +148,7 @@ describe("WriteSingleRegisterRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new WriteSingleRegisterRequest(0x0001, 0x1337);
-      var res = req.createResponse(new Buffer([0x86, 0x02]));
+      var res = req.createResponse(Buffer.from([0x86, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x06);
@@ -158,7 +158,7 @@ describe("WriteSingleRegisterRequest", function()
     it("should return an instance of WriteSingleRegisterResponse if the function code is not an exception", function()
     {
       var req = new WriteSingleRegisterRequest(0x0001, 0x1337);
-      var res = req.createResponse(new Buffer([0x06, 0x00, 0x01, 0x13, 0x37]));
+      var res = req.createResponse(Buffer.from([0x06, 0x00, 0x01, 0x13, 0x37]));
 
       res.should.be.an.instanceOf(WriteSingleRegisterResponse);
       res.getCode().should.be.equal(0x06);

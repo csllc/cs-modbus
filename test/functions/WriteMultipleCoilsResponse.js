@@ -83,12 +83,12 @@ describe("WriteMultipleCoilsResponse", function()
     {
       function test1()
       {
-        WriteMultipleCoilsResponse.fromBuffer(new Buffer([]));
+        WriteMultipleCoilsResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteMultipleCoilsResponse.fromBuffer(new Buffer([0x0F, 0x12, 0x34, 0x00]));
+        WriteMultipleCoilsResponse.fromBuffer(Buffer.from([0x0F, 0x12, 0x34, 0x00]));
       }
 
       test1.should.throw();
@@ -99,7 +99,7 @@ describe("WriteMultipleCoilsResponse", function()
     {
       function test()
       {
-        WriteMultipleCoilsResponse.fromBuffer(new Buffer([0x03, 0x12, 0x34, 0x00, 0x01]));
+        WriteMultipleCoilsResponse.fromBuffer(Buffer.from([0x03, 0x12, 0x34, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -107,12 +107,12 @@ describe("WriteMultipleCoilsResponse", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      WriteMultipleCoilsResponse.fromBuffer(new Buffer([0x0F, 0x12, 0x34, 0x00, 0x11])).getAddress().should.be.equal(0x1234);
+      WriteMultipleCoilsResponse.fromBuffer(Buffer.from([0x0F, 0x12, 0x34, 0x00, 0x11])).getAddress().should.be.equal(0x1234);
     });
 
     it("should read uint16 at 3 as a quantity", function()
     {
-      WriteMultipleCoilsResponse.fromBuffer(new Buffer([0x0F, 0x12, 0x34, 0x00, 0x11])).getQuantity().should.be.equal(0x0011);
+      WriteMultipleCoilsResponse.fromBuffer(Buffer.from([0x0F, 0x12, 0x34, 0x00, 0x11])).getQuantity().should.be.equal(0x0011);
     });
   });
 
@@ -143,7 +143,7 @@ describe("WriteMultipleCoilsResponse", function()
   {
     it("should return a string", function()
     {
-      new WriteMultipleCoilsResponse(0x0001, 2).toString().should.be.a('string');
+      new WriteMultipleCoilsResponse(0x0001, 2).toString().should.be.a.String();
     });
   });
 

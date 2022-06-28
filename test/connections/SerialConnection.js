@@ -23,7 +23,7 @@ describe("SerialConnection", function()
 
     conn.on('error', function()
     {
-      actualHits.push(arguments);
+      actualHits.push([].slice.call(arguments));
     });
 
     serialPort.emit('error', expectedHits[0][0]);
@@ -34,14 +34,14 @@ describe("SerialConnection", function()
   it("should emit data events emitted by the specified SerialPort", function()
   {
     var serialPort = new EventEmitter();
-    var expectedHits = [[new Buffer(10)]];
+    var expectedHits = [[Buffer.alloc(10)]];
     var actualHits = [];
 
     var conn = new SerialConnection(serialPort);
 
     conn.on('data', function()
     {
-      actualHits.push(arguments);
+      actualHits.push([].slice.call(arguments));
     });
 
     serialPort.emit('data', expectedHits[0][0]);
@@ -90,12 +90,12 @@ describe("SerialConnection", function()
     it("should delegate to a write method of the specified SerialPort", function()
     {
       var serialPort = new EventEmitter();
-      var expectedHits = [[new Buffer(10)]];
+      var expectedHits = [[Buffer.alloc(10)]];
       var actualHits = [];
 
       serialPort.write = function()
       {
-        actualHits.push(arguments);
+        actualHits.push([].slice.call(arguments));
       };
 
       var conn = new SerialConnection(serialPort);
@@ -123,7 +123,7 @@ describe("SerialConnection", function()
         actualError = err;
       });
 
-      conn.write(new Buffer(10));
+      conn.write(Buffer.alloc(10));
 
       actualError.should.be.equal(expectedError);
     });
@@ -131,7 +131,7 @@ describe("SerialConnection", function()
     it("should emit a write event with the specified data as the first argument", function()
     {
       var serialPort = new EventEmitter();
-      var expectedHits = [[new Buffer(10)]];
+      var expectedHits = [[Buffer.alloc(10)]];
       var actualHits = [];
 
       serialPort.write = function() {};
@@ -140,7 +140,7 @@ describe("SerialConnection", function()
 
       conn.on('write', function()
       {
-        actualHits.push(arguments);
+        actualHits.push([].slice.call(arguments));
       });
 
       conn.write.apply(conn, expectedHits[0]);
@@ -151,7 +151,7 @@ describe("SerialConnection", function()
     it("should emit a write event even if the SerialPort.write() threw", function()
     {
       var serialPort = new EventEmitter();
-      var expectedHits = [[new Buffer(10)]];
+      var expectedHits = [[Buffer.alloc(10)]];
       var actualHits = [];
       var expectedError = new Error("FAKE SerialPort.write()");
       var actualError = null;
@@ -166,7 +166,7 @@ describe("SerialConnection", function()
       });
       conn.on('write', function()
       {
-        actualHits.push(arguments);
+        actualHits.push([].slice.call(arguments));
       });
 
       conn.write.apply(conn, expectedHits[0]);
@@ -249,25 +249,25 @@ describe("SerialConnection", function()
 
   describe("isOpen", function()
   {
-    it("should return true if the SerialPort.fd property is truthy", function()
+    it("should return true if the SerialPort.isOpen property is truthy", function()
     {
       [true, 1, 'yes'].forEach(function(truthy)
       {
         var serialPort = new EventEmitter();
-        serialPort.fd = truthy;
+        serialPort.isOpen = truthy;
 
-        new SerialConnection(serialPort).isOpen().should.be.equal(true);
+        new SerialConnection(serialPort).isOpen().should.be.ok;
       });
     });
 
-    it("should return false if the SerialPort.fd property is falsy", function()
+    it("should return false if the SerialPort.isOpen property is falsy", function()
     {
-      [false, 0, null].forEach(function(falsy)
+      [false, 0, 'no'].forEach(function(falsy)
       {
         var serialPort = new EventEmitter();
-        serialPort.fd = falsy;
+        serialPort.isOpen = falsy;
 
-        new SerialConnection(serialPort).isOpen().should.be.equal(false);
+        new SerialConnection(serialPort).isOpen().should.be.not.ok;
       });
     });
   });

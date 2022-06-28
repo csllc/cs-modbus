@@ -84,12 +84,12 @@ describe("WriteMultipleCoilsRequest", function()
     {
       function test1()
       {
-        WriteMultipleCoilsRequest.fromBuffer(new Buffer([]));
+        WriteMultipleCoilsRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteMultipleCoilsRequest.fromBuffer(new Buffer([0x0F, 0x00, 0x00, 0x00, 0x01, 0x01]));
+        WriteMultipleCoilsRequest.fromBuffer(Buffer.from([0x0F, 0x00, 0x00, 0x00, 0x01, 0x01]));
       }
 
       test1.should.throw();
@@ -100,7 +100,7 @@ describe("WriteMultipleCoilsRequest", function()
     {
       function test()
       {
-        WriteMultipleCoilsRequest.fromBuffer(new Buffer([0x03, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01]));
+        WriteMultipleCoilsRequest.fromBuffer(Buffer.from([0x03, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01]));
       }
 
       test.should.throw();
@@ -108,7 +108,7 @@ describe("WriteMultipleCoilsRequest", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      var frame = new Buffer([0x0F, 0x12, 0x34, 0x00, 0x01, 0x01, 0x01]);
+      var frame = Buffer.from([0x0F, 0x12, 0x34, 0x00, 0x01, 0x01, 0x01]);
       var req = WriteMultipleCoilsRequest.fromBuffer(frame);
 
       req.getAddress().should.be.equal(0x1234);
@@ -116,7 +116,7 @@ describe("WriteMultipleCoilsRequest", function()
 
     it("should read bytes starting at 6 as an array of states of length specified as uint16 at 3", function()
     {
-      var frame = new Buffer([0x0F, 0x12, 0x34, 0x00, 0x06, 0x01, 0x3F]);
+      var frame = Buffer.from([0x0F, 0x12, 0x34, 0x00, 0x06, 0x01, 0x3F]);
       var req = WriteMultipleCoilsRequest.fromBuffer(frame);
 
       req.getStates().should.be.eql([1, 1, 1, 1, 1, 1].map(Boolean)); // 0x3F
@@ -170,7 +170,7 @@ describe("WriteMultipleCoilsRequest", function()
   {
     it("should return a string", function()
     {
-      new WriteMultipleCoilsRequest(0x0001, [0, 1]).toString().should.be.a('string');
+      new WriteMultipleCoilsRequest(0x0001, [0, 1]).toString().should.be.a.String();
     });
   });
 
@@ -179,7 +179,7 @@ describe("WriteMultipleCoilsRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new WriteMultipleCoilsRequest(0x0001, [0, 1]);
-      var res = req.createResponse(new Buffer([0x8F, 0x02]));
+      var res = req.createResponse(Buffer.from([0x8F, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x0F);
@@ -189,7 +189,7 @@ describe("WriteMultipleCoilsRequest", function()
     it("should return an instance of WriteMultipleCoilsResponse if the function code is not an exception", function()
     {
       var req = new WriteMultipleCoilsRequest(0x0001, [0, 1, 0]);
-      var res = req.createResponse(new Buffer([0x0F, 0x00, 0x01, 0x00, 0x03]));
+      var res = req.createResponse(Buffer.from([0x0F, 0x00, 0x01, 0x00, 0x03]));
 
       res.should.be.an.instanceOf(WriteMultipleCoilsResponse);
       res.getCode().should.be.equal(0x0F);

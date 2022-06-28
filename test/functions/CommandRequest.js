@@ -63,12 +63,12 @@ describe("CommandRequest", function()
     {
       function test1()
       {
-        CommandRequest.fromBuffer(new Buffer([]));
+        CommandRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        CommandRequest.fromBuffer(new Buffer([0x03]));
+        CommandRequest.fromBuffer(Buffer.from([0x03]));
       }
 
       test1.should.throw();
@@ -79,7 +79,7 @@ describe("CommandRequest", function()
     {
       function test()
       {
-        CommandRequest.fromBuffer(new Buffer([0x02, 0x00]));
+        CommandRequest.fromBuffer(Buffer.from([0x02, 0x00]));
       }
 
       test.should.throw();
@@ -87,7 +87,7 @@ describe("CommandRequest", function()
 
     it("should read uint8 at 1 as an id", function()
     {
-      CommandRequest.fromBuffer(new Buffer([0x47, 0x12])).getId().should.be.equal(0x12);
+      CommandRequest.fromBuffer(Buffer.from([0x47, 0x12])).getId().should.be.equal(0x12);
     });
 
   });
@@ -115,7 +115,7 @@ describe("CommandRequest", function()
   {
     it("should return a string", function()
     {
-      new CommandRequest(2).toString().should.be.a('string');
+      new CommandRequest(2).toString().should.be.a.String();
     });
   });
 
@@ -124,7 +124,7 @@ describe("CommandRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new CommandRequest(2);
-      var res = req.createResponse(new Buffer([0xC7, 0x22]));
+      var res = req.createResponse(Buffer.from([0xC7, 0x22]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x47);
@@ -134,7 +134,7 @@ describe("CommandRequest", function()
     it("should return an instance of CommandResponse if the function code is not an exception", function()
     {
       var req = new CommandRequest(2);
-      var res = req.createResponse(new Buffer([0x47, 0x02, 0x01, 0x01]));
+      var res = req.createResponse(Buffer.from([0x47, 0x02, 0x01, 0x01]));
 
       res.should.be.an.instanceOf(CommandResponse);
       res.getCode().should.be.equal(0x47);

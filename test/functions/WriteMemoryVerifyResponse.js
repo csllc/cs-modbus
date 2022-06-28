@@ -7,25 +7,25 @@ require('should');
 
 var LIB_DIR = process.env.LIB_FOR_TESTS_DIR || '../../lib';
 
-var WriteObjectResponse = require(LIB_DIR + '/functions/WriteObjectResponse');
+var WriteMemoryVerifyResponse = require(LIB_DIR + '/functions/WriteMemoryVerifyResponse');
 
-describe("WriteObjectResponse", function()
+describe("WriteMemoryVerifyResponse", function()
 {
   it("should throw if the specified status is invalid", function()
   {
     function testLessThanZero1()
     {
-      new WriteObjectResponse(-1337);
+      new WriteMemoryVerifyResponse(-1337);
     }
 
     function testLessThanZero2()
     {
-      new WriteObjectResponse(-1);
+      new WriteMemoryVerifyResponse(-1);
     }
 
     function testTooBig()
     {
-      new WriteObjectResponse(0x100);
+      new WriteMemoryVerifyResponse(0x100);
     }
 
     testLessThanZero1.should.throw();
@@ -37,7 +37,7 @@ describe("WriteObjectResponse", function()
   {
     it("should return a valid function code", function()
     {
-      new WriteObjectResponse(0x00).getCode().should.be.equal(0x44);
+      new WriteMemoryVerifyResponse(0x00).getCode().should.be.equal(0x64);
     });
   });
 
@@ -45,7 +45,7 @@ describe("WriteObjectResponse", function()
   {
     it("should create an instance from the specified options object", function()
     {
-      var req = WriteObjectResponse.fromOptions({
+      var req = WriteMemoryVerifyResponse.fromOptions({
         status: 0x01,
       });
 
@@ -59,12 +59,12 @@ describe("WriteObjectResponse", function()
     {
       function test1()
       {
-        WriteObjectResponse.fromBuffer(Buffer.from([]));
+        WriteMemoryVerifyResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteObjectResponse.fromBuffer(Buffer.from([0x44]));
+        WriteMemoryVerifyResponse.fromBuffer(Buffer.from([0x64]));
       }
 
       test1.should.throw();
@@ -75,7 +75,7 @@ describe("WriteObjectResponse", function()
     {
       function test()
       {
-        WriteObjectResponse.fromBuffer(Buffer.from([0x03, 0x00, 0x00, 0x00, 0x01]));
+        WriteMemoryVerifyResponse.fromBuffer(Buffer.from([0x03, 0x00, 0x00, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -83,8 +83,8 @@ describe("WriteObjectResponse", function()
 
     it("should read uint8 at 1 as a status", function()
     {
-      var frame = Buffer.from([0x44, 0x12]);
-      var req = WriteObjectResponse.fromBuffer(frame);
+      var frame = Buffer.from([0x64, 0x12]);
+      var req = WriteMemoryVerifyResponse.fromBuffer(frame);
 
       req.getStatus().should.be.equal(0x12);
     });
@@ -95,17 +95,17 @@ describe("WriteObjectResponse", function()
   {
     it("should return a 2 byte long Buffer", function()
     {
-      new WriteObjectResponse(0x01).toBuffer().length.should.be.equal(2);
+      new WriteMemoryVerifyResponse(0x01).toBuffer().length.should.be.equal(2);
     });
 
     it("should write the function code as uint8 at 0", function()
     {
-      new WriteObjectResponse(0x02).toBuffer()[0].should.be.equal(0x44);
+      new WriteMemoryVerifyResponse(0x02).toBuffer()[0].should.be.equal(0x64);
     });
 
     it("should write the status 1", function()
     {
-      new WriteObjectResponse(0x31).toBuffer()[1].should.be.equal(0x31);
+      new WriteMemoryVerifyResponse(0x31).toBuffer()[1].should.be.equal(0x31);
     });
 
   });
@@ -114,7 +114,7 @@ describe("WriteObjectResponse", function()
   {
     it("should return a string", function()
     {
-      new WriteObjectResponse(0x01).toString().should.be.a.String();
+      new WriteMemoryVerifyResponse(0x01).toString().should.be.a.String();
     });
   });
 
@@ -122,7 +122,7 @@ describe("WriteObjectResponse", function()
   {
     it("should return a status value specified in the constructor", function()
     {
-      new WriteObjectResponse(0x12).getStatus().should.be.equal(0x12);
+      new WriteMemoryVerifyResponse(0x12).getStatus().should.be.equal(0x12);
     });
   });
 });

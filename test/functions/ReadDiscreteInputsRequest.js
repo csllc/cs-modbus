@@ -95,12 +95,12 @@ describe("ReadDiscreteInputsRequest", function()
     {
       function test1()
       {
-        ReadDiscreteInputsRequest.fromBuffer(new Buffer([]));
+        ReadDiscreteInputsRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ReadDiscreteInputsRequest.fromBuffer(new Buffer([0x02, 0x00, 0x01, 0x00]));
+        ReadDiscreteInputsRequest.fromBuffer(Buffer.from([0x02, 0x00, 0x01, 0x00]));
       }
 
       test1.should.throw();
@@ -111,7 +111,7 @@ describe("ReadDiscreteInputsRequest", function()
     {
       function test()
       {
-        ReadDiscreteInputsRequest.fromBuffer(new Buffer([0x00, 0x00, 0x01, 0x00, 0x01]));
+        ReadDiscreteInputsRequest.fromBuffer(Buffer.from([0x00, 0x00, 0x01, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -119,12 +119,12 @@ describe("ReadDiscreteInputsRequest", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      ReadDiscreteInputsRequest.fromBuffer(new Buffer([0x02, 0x12, 0x34, 0x00, 0x11])).getAddress().should.be.equal(0x1234);
+      ReadDiscreteInputsRequest.fromBuffer(Buffer.from([0x02, 0x12, 0x34, 0x00, 0x11])).getAddress().should.be.equal(0x1234);
     });
 
     it("should read uint16 at 3 as a quantity", function()
     {
-      ReadDiscreteInputsRequest.fromBuffer(new Buffer([0x02, 0x12, 0x34, 0x00, 0x11])).getQuantity().should.be.equal(0x0011);
+      ReadDiscreteInputsRequest.fromBuffer(Buffer.from([0x02, 0x12, 0x34, 0x00, 0x11])).getQuantity().should.be.equal(0x0011);
     });
   });
 
@@ -155,7 +155,7 @@ describe("ReadDiscreteInputsRequest", function()
   {
     it("should return a string", function()
     {
-      new ReadDiscreteInputsRequest(0x0001, 2).toString().should.be.a('string');
+      new ReadDiscreteInputsRequest(0x0001, 2).toString().should.be.a.String();
     });
   });
 
@@ -164,7 +164,7 @@ describe("ReadDiscreteInputsRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new ReadDiscreteInputsRequest(0x0001, 2);
-      var res = req.createResponse(new Buffer([0x82, 0x01]));
+      var res = req.createResponse(Buffer.from([0x82, 0x01]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x02);
@@ -174,7 +174,7 @@ describe("ReadDiscreteInputsRequest", function()
     it("should return an instance of ReadDiscreteInputsResponse if the function code is not an exception", function()
     {
       var req = new ReadDiscreteInputsRequest(0x0001, 2);
-      var res = req.createResponse(new Buffer([0x02, 0x01, 0x00]));
+      var res = req.createResponse(Buffer.from([0x02, 0x01, 0x00]));
 
       res.should.be.an.instanceOf(ReadDiscreteInputsResponse);
       res.getCode().should.be.equal(0x02);

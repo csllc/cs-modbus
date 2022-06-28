@@ -93,12 +93,12 @@ describe("WriteMultipleRegistersResponse", function()
     {
       function test1()
       {
-        WriteMultipleRegistersResponse.fromBuffer(new Buffer([]));
+        WriteMultipleRegistersResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteMultipleRegistersResponse.fromBuffer(new Buffer([0x10, 0x00, 0x01, 0x00]));
+        WriteMultipleRegistersResponse.fromBuffer(Buffer.from([0x10, 0x00, 0x01, 0x00]));
       }
 
       test1.should.throw();
@@ -109,7 +109,7 @@ describe("WriteMultipleRegistersResponse", function()
     {
       function test()
       {
-        WriteMultipleRegistersResponse.fromBuffer(new Buffer([0x02, 0x00, 0x01, 0x00, 0x01]));
+        WriteMultipleRegistersResponse.fromBuffer(Buffer.from([0x02, 0x00, 0x01, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -117,12 +117,12 @@ describe("WriteMultipleRegistersResponse", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      WriteMultipleRegistersResponse.fromBuffer(new Buffer([0x10, 0x12, 0x34, 0x00, 0x11])).getAddress().should.be.equal(0x1234);
+      WriteMultipleRegistersResponse.fromBuffer(Buffer.from([0x10, 0x12, 0x34, 0x00, 0x11])).getAddress().should.be.equal(0x1234);
     });
 
     it("should read uint16 at 3 as a quantity", function()
     {
-      WriteMultipleRegistersResponse.fromBuffer(new Buffer([0x10, 0x12, 0x34, 0x00, 0x11])).getQuantity().should.be.equal(0x0011);
+      WriteMultipleRegistersResponse.fromBuffer(Buffer.from([0x10, 0x12, 0x34, 0x00, 0x11])).getQuantity().should.be.equal(0x0011);
     });
   });
 
@@ -153,7 +153,7 @@ describe("WriteMultipleRegistersResponse", function()
   {
     it("should return a string", function()
     {
-      new WriteMultipleRegistersResponse(0x0001, 2).toString().should.be.a('string');
+      new WriteMultipleRegistersResponse(0x0001, 2).toString().should.be.a.String();
     });
   });
 

@@ -68,12 +68,12 @@ describe("ReadObjectRequest", function()
     {
       function test1()
       {
-        ReadObjectRequest.fromBuffer(new Buffer([]));
+        ReadObjectRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ReadObjectRequest.fromBuffer(new Buffer([0x03]));
+        ReadObjectRequest.fromBuffer(Buffer.from([0x03]));
       }
 
       test1.should.throw();
@@ -84,7 +84,7 @@ describe("ReadObjectRequest", function()
     {
       function test()
       {
-        ReadObjectRequest.fromBuffer(new Buffer([0x02, 0x00]));
+        ReadObjectRequest.fromBuffer(Buffer.from([0x02, 0x00]));
       }
 
       test.should.throw();
@@ -92,7 +92,7 @@ describe("ReadObjectRequest", function()
 
     it("should read uint8 at 1 as an id", function()
     {
-      ReadObjectRequest.fromBuffer(new Buffer([0x43, 0x12])).getId().should.be.equal(0x12);
+      ReadObjectRequest.fromBuffer(Buffer.from([0x43, 0x12])).getId().should.be.equal(0x12);
     });
 
   });
@@ -120,7 +120,7 @@ describe("ReadObjectRequest", function()
   {
     it("should return a string", function()
     {
-      new ReadObjectRequest(2).toString().should.be.a('string');
+      new ReadObjectRequest(2).toString().should.be.a.String();
     });
   });
 
@@ -129,7 +129,7 @@ describe("ReadObjectRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new ReadObjectRequest(2);
-      var res = req.createResponse(new Buffer([0xC3, 0x22]));
+      var res = req.createResponse(Buffer.from([0xC3, 0x22]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x43);
@@ -139,7 +139,7 @@ describe("ReadObjectRequest", function()
     it("should return an instance of ReadObjectResponse if the function code is not an exception", function()
     {
       var req = new ReadObjectRequest(2);
-      var res = req.createResponse(new Buffer([0x43, 0x02, 0x01, 0x01]));
+      var res = req.createResponse(Buffer.from([0x43, 0x02, 0x01, 0x01]));
 
       res.should.be.an.instanceOf(ReadObjectResponse);
       res.getCode().should.be.equal(0x43);

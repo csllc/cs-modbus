@@ -15,12 +15,12 @@ describe("ReportSlaveIdResponse", function()
   {
     function testEmpty()
     {
-      new Response(new Buffer(0));
+      new Response(Buffer.alloc(0));
     }
 
     function testTooLong()
     {
-      new Response(new Buffer(8));
+      new Response(Buffer.alloc(8));
     }
 
 
@@ -80,7 +80,7 @@ describe("ReportSlaveIdResponse", function()
   {
     it("should return a valid function code", function()
     {
-      Response.fromBuffer(new Buffer([0x11, 0x05, 0x03, 0xFF,
+      Response.fromBuffer(Buffer.from([0x11, 0x05, 0x03, 0xFF,
         0x04, 0x05, 0x06])).getCode().should.be.equal(0x11);
     });
   });
@@ -105,12 +105,12 @@ describe("ReportSlaveIdResponse", function()
     {
       function test1()
       {
-        Response.fromBuffer(new Buffer([]));
+        Response.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        Response.fromBuffer(new Buffer([0x04, 0x02, 0x00, 0x00, 0x00, 0x00]));
+        Response.fromBuffer(Buffer.from([0x04, 0x02, 0x00, 0x00, 0x00, 0x00]));
       }
 
       test1.should.throw();
@@ -121,7 +121,7 @@ describe("ReportSlaveIdResponse", function()
     {
       function test()
       {
-        Response.fromBuffer(new Buffer([0x01, 0x00]));
+        Response.fromBuffer(Buffer.from([0x01, 0x00]));
       }
 
       test.should.throw();
@@ -134,7 +134,7 @@ describe("ReportSlaveIdResponse", function()
 
     it("should write the function code as uint8 at 0", function()
     {
-      var res = Response.fromBuffer(new Buffer([0x11, 0x05, 0x01, 0xFF, 0x03, 0x04, 0x05]));
+      var res = Response.fromBuffer(Buffer.from([0x11, 0x05, 0x01, 0xFF, 0x03, 0x04, 0x05]));
       res.toBuffer()[0].should.be.equal(0x11);
     });
 
@@ -144,7 +144,7 @@ describe("ReportSlaveIdResponse", function()
   {
     it("should return a string", function()
     {
-      Response.fromBuffer(new Buffer([0x11, 0x01, 0x05, 0xFF, 0x02, 0x02, 0x02])).toString().should.be.a('string');
+      Response.fromBuffer(Buffer.from([0x11, 0x01, 0x05, 0xFF, 0x02, 0x02, 0x02])).toString().should.be.a.String();
     });
   });
 
@@ -152,7 +152,7 @@ describe("ReportSlaveIdResponse", function()
   {
     it("should return a string from Buffer specified in the constructor", function()
     {
-      var values = Response.fromBuffer(new Buffer([0x11, 0x01, 0x05, 0xFF, 0x02, 0x20, 0xFF]))
+      var values = Response.fromBuffer(Buffer.from([0x11, 0x01, 0x05, 0xFF, 0x02, 0x20, 0xFF]))
         .getVersion();
       values.should.be.eql('2.32.255');
     });

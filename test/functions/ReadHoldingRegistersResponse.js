@@ -15,17 +15,17 @@ describe("ReadHoldingRegistersResponse", function()
   {
     function testEmpty()
     {
-      new ReadHoldingRegistersResponse(new Buffer(0));
+      new ReadHoldingRegistersResponse(Buffer.alloc(0));
     }
 
     function testGreaterThan250()
     {
-      new ReadHoldingRegistersResponse(new Buffer(252));
+      new ReadHoldingRegistersResponse(Buffer.alloc(252));
     }
 
     function testOdd()
     {
-      new ReadHoldingRegistersResponse(new Buffer(101));
+      new ReadHoldingRegistersResponse(Buffer.alloc(101));
     }
 
     testEmpty.should.throw();
@@ -37,7 +37,7 @@ describe("ReadHoldingRegistersResponse", function()
   {
     it("should return a valid function code", function()
     {
-      new ReadHoldingRegistersResponse(new Buffer([0x01, 0x02, 0x03, 0x04])).getCode().should.be.equal(0x03);
+      new ReadHoldingRegistersResponse(Buffer.from([0x01, 0x02, 0x03, 0x04])).getCode().should.be.equal(0x03);
     });
   });
 
@@ -46,10 +46,10 @@ describe("ReadHoldingRegistersResponse", function()
     it("should create an instance from the specified options object", function()
     {
       var res = ReadHoldingRegistersResponse.fromOptions({
-        values: new Buffer([0x01, 0x02, 0x03, 0x04])
+        values: Buffer.from([0x01, 0x02, 0x03, 0x04])
       });
 
-      res.getValues().should.be.eql(new Buffer([0x01, 0x02, 0x03, 0x04]));
+      res.getValues().should.be.eql(Buffer.from([0x01, 0x02, 0x03, 0x04]));
     });
   });
 
@@ -59,12 +59,12 @@ describe("ReadHoldingRegistersResponse", function()
     {
       function test1()
       {
-        ReadHoldingRegistersResponse.fromBuffer(new Buffer([]));
+        ReadHoldingRegistersResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ReadHoldingRegistersResponse.fromBuffer(new Buffer([0x03, 0x02, 0x00]));
+        ReadHoldingRegistersResponse.fromBuffer(Buffer.from([0x03, 0x02, 0x00]));
       }
 
       test1.should.throw();
@@ -75,7 +75,7 @@ describe("ReadHoldingRegistersResponse", function()
     {
       function test()
       {
-        ReadHoldingRegistersResponse.fromBuffer(new Buffer([0x01, 0x00]));
+        ReadHoldingRegistersResponse.fromBuffer(Buffer.from([0x01, 0x00]));
       }
 
       test.should.throw();
@@ -83,7 +83,7 @@ describe("ReadHoldingRegistersResponse", function()
 
     it("should read N bytes starting at 2 where N is a byte at 1 as a values Buffer", function()
     {
-      ReadHoldingRegistersResponse.fromBuffer(new Buffer([0x03, 0x02, 0xAB, 0xCD])).getValues().should.be.eql(new Buffer([0xAB, 0xCD]));
+      ReadHoldingRegistersResponse.fromBuffer(Buffer.from([0x03, 0x02, 0xAB, 0xCD])).getValues().should.be.eql(Buffer.from([0xAB, 0xCD]));
     });
   });
 
@@ -91,22 +91,22 @@ describe("ReadHoldingRegistersResponse", function()
   {
     it("should return a 6 byte long Buffer for 2 registers", function()
     {
-      new ReadHoldingRegistersResponse(new Buffer([0x01, 0x02, 0x03, 0x04])).toBuffer().length.should.be.equal(6);
+      new ReadHoldingRegistersResponse(Buffer.from([0x01, 0x02, 0x03, 0x04])).toBuffer().length.should.be.equal(6);
     });
 
     it("should write the function code as uint8 at 0", function()
     {
-      new ReadHoldingRegistersResponse(new Buffer([0x01, 0x02, 0x03, 0x04])).toBuffer()[0].should.be.equal(0x03);
+      new ReadHoldingRegistersResponse(Buffer.from([0x01, 0x02, 0x03, 0x04])).toBuffer()[0].should.be.equal(0x03);
     });
 
     it("should write the following byte count as uint8 at 1", function()
     {
-      new ReadHoldingRegistersResponse(new Buffer([0x01, 0x02, 0x03, 0x04])).toBuffer()[1].should.be.equal(4);
+      new ReadHoldingRegistersResponse(Buffer.from([0x01, 0x02, 0x03, 0x04])).toBuffer()[1].should.be.equal(4);
     });
 
     it("should write the Buffer of values at 2", function()
     {
-      var res = new ReadHoldingRegistersResponse(new Buffer([0x01, 0x02, 0x03, 0x04]));
+      var res = new ReadHoldingRegistersResponse(Buffer.from([0x01, 0x02, 0x03, 0x04]));
       var buf = res.toBuffer();
 
       buf[2].should.be.equal(0x01);
@@ -120,7 +120,7 @@ describe("ReadHoldingRegistersResponse", function()
   {
     it("should return a string", function()
     {
-      new ReadHoldingRegistersResponse(new Buffer([0x01, 0x02, 0x03, 0x04])).toString().should.be.a('string');
+      new ReadHoldingRegistersResponse(Buffer.from([0x01, 0x02, 0x03, 0x04])).toString().should.be.a.String();
     });
   });
 
@@ -128,7 +128,7 @@ describe("ReadHoldingRegistersResponse", function()
   {
     it("should return an a values Buffer specified in the constructor", function()
     {
-      new ReadHoldingRegistersResponse(new Buffer([0x01, 0x02, 0x03, 0x04])).getValues().should.be.eql(new Buffer([0x01, 0x02, 0x03, 0x04]));
+      new ReadHoldingRegistersResponse(Buffer.from([0x01, 0x02, 0x03, 0x04])).getValues().should.be.eql(Buffer.from([0x01, 0x02, 0x03, 0x04]));
     });
   });
 
@@ -136,7 +136,7 @@ describe("ReadHoldingRegistersResponse", function()
   {
     it("should return a length of the values Buffer specified in the constructor divided by 2", function()
     {
-      new ReadHoldingRegistersResponse(new Buffer([0x01, 0x02, 0x03, 0x04])).getCount().should.be.eql(2);
+      new ReadHoldingRegistersResponse(Buffer.from([0x01, 0x02, 0x03, 0x04])).getCount().should.be.eql(2);
     });
   });
 });

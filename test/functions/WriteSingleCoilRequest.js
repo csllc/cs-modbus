@@ -73,12 +73,12 @@ describe("WriteSingleCoilRequest", function()
     {
       function test1()
       {
-        WriteSingleCoilRequest.fromBuffer(new Buffer([]));
+        WriteSingleCoilRequest.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteSingleCoilRequest.fromBuffer(new Buffer([0x05, 0x00, 0x01, 0x00]));
+        WriteSingleCoilRequest.fromBuffer(Buffer.from([0x05, 0x00, 0x01, 0x00]));
       }
 
       test1.should.throw();
@@ -89,7 +89,7 @@ describe("WriteSingleCoilRequest", function()
     {
       function test()
       {
-        WriteSingleCoilRequest.fromBuffer(new Buffer([0x03, 0x00, 0x00, 0x00, 0x01]));
+        WriteSingleCoilRequest.fromBuffer(Buffer.from([0x03, 0x00, 0x00, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -97,7 +97,7 @@ describe("WriteSingleCoilRequest", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      var frame = new Buffer([0x05, 0x12, 0x34, 0x00, 0x01]);
+      var frame = Buffer.from([0x05, 0x12, 0x34, 0x00, 0x01]);
       var req = WriteSingleCoilRequest.fromBuffer(frame);
 
       req.getAddress().should.be.equal(0x1234);
@@ -105,7 +105,7 @@ describe("WriteSingleCoilRequest", function()
 
     it("should set state to TRUE if uint16 at 3 is equal to 0xFF00", function()
     {
-      var frame = new Buffer([0x05, 0x12, 0x34, 0xFF, 0x00]);
+      var frame = Buffer.from([0x05, 0x12, 0x34, 0xFF, 0x00]);
       var req = WriteSingleCoilRequest.fromBuffer(frame);
 
       req.getState().should.be.equal(true);
@@ -113,7 +113,7 @@ describe("WriteSingleCoilRequest", function()
 
     it("should set state to FALSE if uint16 at 3 is not equal to 0xFF00", function()
     {
-      var frame = new Buffer([0x05, 0x12, 0x34, 0x00, 0x00]);
+      var frame = Buffer.from([0x05, 0x12, 0x34, 0x00, 0x00]);
       var req = WriteSingleCoilRequest.fromBuffer(frame);
 
       req.getState().should.be.equal(false);
@@ -152,8 +152,8 @@ describe("WriteSingleCoilRequest", function()
   {
     it("should return a string", function()
     {
-      new WriteSingleCoilRequest(0x0001, true).toString().should.be.a('string');
-      new WriteSingleCoilRequest(0x0001, false).toString().should.be.a('string');
+      new WriteSingleCoilRequest(0x0001, true).toString().should.be.a.String();
+      new WriteSingleCoilRequest(0x0001, false).toString().should.be.a.String();
     });
   });
 
@@ -162,7 +162,7 @@ describe("WriteSingleCoilRequest", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new WriteSingleCoilRequest(0x0001, true);
-      var res = req.createResponse(new Buffer([0x85, 0x02]));
+      var res = req.createResponse(Buffer.from([0x85, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x05);
@@ -172,7 +172,7 @@ describe("WriteSingleCoilRequest", function()
     it("should return an instance of WriteSingleCoilResponse if the function code is not an exception", function()
     {
       var req = new WriteSingleCoilRequest(0x0001, true);
-      var res = req.createResponse(new Buffer([0x05, 0x00, 0x01, 0xFF, 0x00]));
+      var res = req.createResponse(Buffer.from([0x05, 0x00, 0x01, 0xFF, 0x00]));
 
       res.should.be.an.instanceOf(WriteSingleCoilResponse);
       res.getCode().should.be.equal(0x05);

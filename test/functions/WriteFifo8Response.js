@@ -59,12 +59,12 @@ describe("WriteFifo8Response", function()
     {
       function test1()
       {
-        WriteFifo8Response.fromBuffer(new Buffer([]));
+        WriteFifo8Response.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteFifo8Response.fromBuffer(new Buffer([0x05]));
+        WriteFifo8Response.fromBuffer(Buffer.from([0x05]));
       }
 
       test1.should.throw();
@@ -75,7 +75,7 @@ describe("WriteFifo8Response", function()
     {
       function test()
       {
-        WriteFifo8Response.fromBuffer(new Buffer([0x03, 0x00, 0x00, 0x00, 0x01]));
+        WriteFifo8Response.fromBuffer(Buffer.from([0x03, 0x00, 0x00, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -83,7 +83,7 @@ describe("WriteFifo8Response", function()
 
     it("should read uint8 at 1 as a quantity", function()
     {
-      var frame = new Buffer([0x42, 0x12]);
+      var frame = Buffer.from([0x42, 0x12]);
       var req = WriteFifo8Response.fromBuffer(frame);
 
       req.getQuantity().should.be.equal(0x12);
@@ -114,7 +114,7 @@ describe("WriteFifo8Response", function()
   {
     it("should return a string", function()
     {
-      new WriteFifo8Response(0x01).toString().should.be.a('string');
+      new WriteFifo8Response(0x01).toString().should.be.a.String();
     });
   });
 

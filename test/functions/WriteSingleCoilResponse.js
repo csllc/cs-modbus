@@ -71,12 +71,12 @@ describe("WriteSingleCoilResponse", function()
     {
       function test1()
       {
-        WriteSingleCoilResponse.fromBuffer(new Buffer([]));
+        WriteSingleCoilResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteSingleCoilResponse.fromBuffer(new Buffer([0x05, 0x00, 0x01, 0x00]));
+        WriteSingleCoilResponse.fromBuffer(Buffer.from([0x05, 0x00, 0x01, 0x00]));
       }
 
       test1.should.throw();
@@ -87,7 +87,7 @@ describe("WriteSingleCoilResponse", function()
     {
       function test()
       {
-        WriteSingleCoilResponse.fromBuffer(new Buffer([0x03, 0x00, 0x00, 0x00, 0x01]));
+        WriteSingleCoilResponse.fromBuffer(Buffer.from([0x03, 0x00, 0x00, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -95,7 +95,7 @@ describe("WriteSingleCoilResponse", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      var frame = new Buffer([0x05, 0x12, 0x34, 0x00, 0x01]);
+      var frame = Buffer.from([0x05, 0x12, 0x34, 0x00, 0x01]);
       var req = WriteSingleCoilResponse.fromBuffer(frame);
 
       req.getAddress().should.be.equal(0x1234);
@@ -103,7 +103,7 @@ describe("WriteSingleCoilResponse", function()
 
     it("should set state to TRUE if uint16 at 3 is equal to 0xFF00", function()
     {
-      var frame = new Buffer([0x05, 0x12, 0x34, 0xFF, 0x00]);
+      var frame = Buffer.from([0x05, 0x12, 0x34, 0xFF, 0x00]);
       var req = WriteSingleCoilResponse.fromBuffer(frame);
 
       req.getState().should.be.equal(true);
@@ -111,7 +111,7 @@ describe("WriteSingleCoilResponse", function()
 
     it("should set state to FALSE if uint16 at 3 is not equal to 0xFF00", function()
     {
-      var frame = new Buffer([0x05, 0x12, 0x34, 0x00, 0x00]);
+      var frame = Buffer.from([0x05, 0x12, 0x34, 0x00, 0x00]);
       var req = WriteSingleCoilResponse.fromBuffer(frame);
 
       req.getState().should.be.equal(false);
@@ -150,8 +150,8 @@ describe("WriteSingleCoilResponse", function()
   {
     it("should return a string", function()
     {
-      new WriteSingleCoilResponse(0x0001, true).toString().should.be.a('string');
-      new WriteSingleCoilResponse(0x0001, false).toString().should.be.a('string');
+      new WriteSingleCoilResponse(0x0001, true).toString().should.be.a.String();
+      new WriteSingleCoilResponse(0x0001, false).toString().should.be.a.String();
     });
   });
 

@@ -111,12 +111,12 @@ describe("ReadFifo8Request", function()
     {
       function test1()
       {
-        ReadFifo8Request.fromBuffer(new Buffer([]));
+        ReadFifo8Request.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ReadFifo8Request.fromBuffer(new Buffer([0x03, 0x00]));
+        ReadFifo8Request.fromBuffer(Buffer.from([0x03, 0x00]));
       }
 
       test1.should.throw();
@@ -127,7 +127,7 @@ describe("ReadFifo8Request", function()
     {
       function test()
       {
-        ReadFifo8Request.fromBuffer(new Buffer([0x02, 0x00, 0x80]));
+        ReadFifo8Request.fromBuffer(Buffer.from([0x02, 0x00, 0x80]));
       }
 
       test.should.throw();
@@ -135,12 +135,12 @@ describe("ReadFifo8Request", function()
 
     it("should read uint8 at 1 as an id", function()
     {
-      ReadFifo8Request.fromBuffer(new Buffer([0x41, 0x12, 0x34])).getId().should.be.equal(0x12);
+      ReadFifo8Request.fromBuffer(Buffer.from([0x41, 0x12, 0x34])).getId().should.be.equal(0x12);
     });
 
     it("should read uint16 at 2 as max", function()
     {
-      ReadFifo8Request.fromBuffer(new Buffer([0x41, 0x12, 0x34])).getMax().should.be.equal(0x34);
+      ReadFifo8Request.fromBuffer(Buffer.from([0x41, 0x12, 0x34])).getMax().should.be.equal(0x34);
     });
   });
 
@@ -171,7 +171,7 @@ describe("ReadFifo8Request", function()
   {
     it("should return a string", function()
     {
-      new ReadFifo8Request(0x0001, 2).toString().should.be.a('string');
+        new ReadFifo8Request(0x0001, 2).toString().should.be.a.String();
     });
   });
 
@@ -180,7 +180,7 @@ describe("ReadFifo8Request", function()
     it("should return an instance of ExceptionResponse if the function code is an exception", function()
     {
       var req = new ReadFifo8Request(0x0001, 2);
-      var res = req.createResponse(new Buffer([0xC1, 0x02]));
+      var res = req.createResponse(Buffer.from([0xC1, 0x02]));
 
       res.should.be.an.instanceOf(ExceptionResponse);
       res.getCode().should.be.equal(0x41);
@@ -190,7 +190,7 @@ describe("ReadFifo8Request", function()
     it("should return an instance of ReadFifo8Response if the function code is not an exception", function()
     {
       var req = new ReadFifo8Request(0x01, 2);
-      var res = req.createResponse(new Buffer([0x41, 0x02, 0x01, 0x01]));
+      var res = req.createResponse(Buffer.from([0x41, 0x02, 0x01, 0x01]));
 
       res.should.be.an.instanceOf(ReadFifo8Response);
       res.getCode().should.be.equal(0x41);

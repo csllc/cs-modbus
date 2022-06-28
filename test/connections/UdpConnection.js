@@ -34,7 +34,7 @@ describe("UdpConnection", function()
   {
     var socket = new EventEmitter();
     var conn = new UdpConnection({socket: socket});
-    var expectedHits = [new Buffer(7)];
+    var expectedHits = [Buffer.alloc(7)];
     var actualHits = [];
 
     conn.on('data', function(data)
@@ -99,7 +99,7 @@ describe("UdpConnection", function()
       ++actualHits;
     });
 
-    options.socket.emit('message', new Buffer(7));
+    options.socket.emit('message', Buffer.alloc(7));
 
     actualHits.should.be.equal(expectedHits);
   });
@@ -118,7 +118,7 @@ describe("UdpConnection", function()
         ++actualHits;
       };
 
-      conn.write(new Buffer(7));
+      conn.write(Buffer.alloc(7));
 
       actualHits.should.be.equal(expectedHits);
     });
@@ -127,7 +127,7 @@ describe("UdpConnection", function()
     {
       var socket = new EventEmitter();
       var conn = new UdpConnection({socket: socket});
-      var expectedData = new Buffer(7);
+      var expectedData = Buffer.alloc(7);
       var actualData = null;
 
       socket.send = function(message)
@@ -152,7 +152,7 @@ describe("UdpConnection", function()
         actualOffset = offset;
       };
 
-      conn.write(new Buffer(7));
+      conn.write(Buffer.alloc(7));
 
       actualOffset.should.be.equal(expectedOffset);
     });
@@ -161,7 +161,7 @@ describe("UdpConnection", function()
     {
       var socket = new EventEmitter();
       var conn = new UdpConnection({socket: socket});
-      var data = new Buffer(7);
+      var data = Buffer.alloc(7);
       var expectedLength = data.length;
       var actualLength = -1;
 
@@ -187,7 +187,7 @@ describe("UdpConnection", function()
         actualPort = port;
       };
 
-      conn.write(new Buffer(7));
+      conn.write(Buffer.alloc(7));
 
       actualPort.should.be.equal(expectedPort);
     });
@@ -206,7 +206,7 @@ describe("UdpConnection", function()
         actualAddress = address;
       };
 
-      conn.write(new Buffer(7));
+      conn.write(Buffer.alloc(7));
 
       actualAddress.should.be.equal(expectedAddress);
     });
@@ -223,7 +223,7 @@ describe("UdpConnection", function()
         actualPort = port;
       };
 
-      conn.write(new Buffer(7));
+      conn.write(Buffer.alloc(7));
 
       actualPort.should.be.equal(expectedPort);
     });
@@ -242,7 +242,7 @@ describe("UdpConnection", function()
         actualAddress = address;
       };
 
-      conn.write(new Buffer(7));
+      conn.write(Buffer.alloc(7));
 
       actualAddress.should.be.equal(expectedAddress);
     });
@@ -265,7 +265,7 @@ describe("UdpConnection", function()
         actualError = err;
       });
 
-      conn.write(new Buffer(7));
+      conn.write(Buffer.alloc(7));
 
       actualError.should.be.equal(expectedError);
     });
@@ -273,7 +273,7 @@ describe("UdpConnection", function()
     it("should emit a write event with the specified data as the first argument", function()
     {
       var socket = new EventEmitter();
-      var expectedHits = [[new Buffer(10)]];
+      var expectedHits = [[Buffer.alloc(10)]];
       var actualHits = [];
 
       socket.send = function() {};
@@ -282,7 +282,7 @@ describe("UdpConnection", function()
 
       conn.on('write', function()
       {
-        actualHits.push(arguments);
+        actualHits.push([].slice.call(arguments));
       });
 
       conn.write.apply(conn, expectedHits[0]);
@@ -293,7 +293,7 @@ describe("UdpConnection", function()
     it("should emit a write event even if the Socket.send() threw", function()
     {
       var socket = new EventEmitter();
-      var expectedHits = [[new Buffer(10)]];
+      var expectedHits = [[Buffer.alloc(10)]];
       var actualHits = [];
       var expectedError = new Error("FAKE Socket.send()");
       var actualError = null;
@@ -308,7 +308,7 @@ describe("UdpConnection", function()
       });
       conn.on('write', function()
       {
-        actualHits.push(arguments);
+        actualHits.push([].slice.call(arguments));
       });
 
       conn.write.apply(conn, expectedHits[0]);

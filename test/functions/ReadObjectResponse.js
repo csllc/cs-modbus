@@ -15,12 +15,12 @@ describe("ReadObjectResponse", function()
   {
     function testGreaterThan250()
     {
-      new ReadObjectResponse(new Buffer(251));
+      new ReadObjectResponse(Buffer.alloc(251));
     }
 
     function testMax()
     {
-      new ReadObjectResponse(new Buffer(250));
+      new ReadObjectResponse(Buffer.alloc(250));
     }
 
     testGreaterThan250.should.throw();
@@ -31,7 +31,7 @@ describe("ReadObjectResponse", function()
   {
     it("should return a valid function code", function()
     {
-      new ReadObjectResponse(new Buffer([0x01, 0x04])).getCode().should.be.equal(0x43);
+      new ReadObjectResponse(Buffer.from([0x01, 0x04])).getCode().should.be.equal(0x43);
     });
   });
 
@@ -40,10 +40,10 @@ describe("ReadObjectResponse", function()
     it("should create an instance from the specified options object", function()
     {
       var res = ReadObjectResponse.fromOptions({
-        values: new Buffer([0xFF, 0xFF])
+        values: Buffer.from([0xFF, 0xFF])
       });
 
-      res.getValues().should.be.eql(new Buffer([0xFF, 0xFF]));
+      res.getValues().should.be.eql(Buffer.from([0xFF, 0xFF]));
     });
 
   });
@@ -54,12 +54,12 @@ describe("ReadObjectResponse", function()
     {
       function test1()
       {
-        ReadObjectResponse.fromBuffer(new Buffer([]));
+        ReadObjectResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ReadObjectResponse.fromBuffer(new Buffer([0x04, 0x00]));
+        ReadObjectResponse.fromBuffer(Buffer.from([0x04, 0x00]));
       }
 
       test1.should.throw();
@@ -70,7 +70,7 @@ describe("ReadObjectResponse", function()
     {
       function test()
       {
-        ReadObjectResponse.fromBuffer(new Buffer([0x01, 0x00]));
+        ReadObjectResponse.fromBuffer(Buffer.from([0x01, 0x00]));
       }
 
       test.should.throw();
@@ -78,8 +78,8 @@ describe("ReadObjectResponse", function()
 
     it("should read N bytes starting at 2 where N is a byte at 1 as a values Buffer", function()
     {
-      ReadObjectResponse.fromBuffer(new Buffer([0x43, 0x02, 0x11, 0x22]))
-        .getValues().should.be.eql(new Buffer([0x11, 0x22]));
+      ReadObjectResponse.fromBuffer(Buffer.from([0x43, 0x02, 0x11, 0x22]))
+        .getValues().should.be.eql(Buffer.from([0x11, 0x22]));
     });
   });
 
@@ -87,22 +87,22 @@ describe("ReadObjectResponse", function()
   {
     it("should return a 3 byte long Buffer for one value", function()
     {
-      new ReadObjectResponse(new Buffer([0x04])).toBuffer().length.should.be.equal(3);
+      new ReadObjectResponse(Buffer.from([0x04])).toBuffer().length.should.be.equal(3);
     });
 
     it("should write the function code as uint8 at 0", function()
     {
-      new ReadObjectResponse(new Buffer([0x04, 0x00])).toBuffer()[0].should.be.equal(0x43);
+      new ReadObjectResponse(Buffer.from([0x04, 0x00])).toBuffer()[0].should.be.equal(0x43);
     });
 
     it("should write the following byte count as uint8 at 1", function()
     {
-      new ReadObjectResponse(new Buffer([0x11, 0x22])).toBuffer()[1].should.be.equal(2);
+      new ReadObjectResponse(Buffer.from([0x11, 0x22])).toBuffer()[1].should.be.equal(2);
     });
 
     it("should write the Buffer of values at 2", function()
     {
-      var res = new ReadObjectResponse(new Buffer([0x11, 0x22, 0x33]));
+      var res = new ReadObjectResponse(Buffer.from([0x11, 0x22, 0x33]));
       var buf = res.toBuffer();
 
       buf[2].should.be.equal(0x11);
@@ -115,7 +115,7 @@ describe("ReadObjectResponse", function()
   {
     it("should return a string", function()
     {
-      new ReadObjectResponse(new Buffer([0x11, 0x22, 0x33])).toString().should.be.a('string');
+      new ReadObjectResponse(Buffer.from([0x11, 0x22, 0x33])).toString().should.be.a.String();
     });
   });
 
@@ -123,7 +123,7 @@ describe("ReadObjectResponse", function()
   {
     it("should return an a values Buffer specified in the constructor", function()
     {
-      new ReadObjectResponse(new Buffer([0x11, 0x22, 0x33])).getValues().should.be.eql(new Buffer([0x11, 0x22, 0x33]));
+      new ReadObjectResponse(Buffer.from([0x11, 0x22, 0x33])).getValues().should.be.eql(Buffer.from([0x11, 0x22, 0x33]));
     });
   });
 
@@ -131,7 +131,7 @@ describe("ReadObjectResponse", function()
   {
     it("should return a length of the values Buffer", function()
     {
-      new ReadObjectResponse(new Buffer([0x11, 0x22, 0x33])).getCount().should.be.eql(3);
+      new ReadObjectResponse(Buffer.from([0x11, 0x22, 0x33])).getCount().should.be.eql(3);
     });
   });
 });

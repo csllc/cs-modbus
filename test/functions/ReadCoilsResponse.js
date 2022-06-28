@@ -53,7 +53,7 @@ describe("ReadCoilsResponse", function()
     {
       function test()
       {
-        ReadCoilsResponse.fromBuffer(new Buffer([]));
+        ReadCoilsResponse.fromBuffer(Buffer.from([]));
       }
 
       test.should.throw();
@@ -63,7 +63,7 @@ describe("ReadCoilsResponse", function()
     {
       function test()
       {
-        ReadCoilsResponse.fromBuffer(new Buffer([0x00, 0x00]));
+        ReadCoilsResponse.fromBuffer(Buffer.from([0x00, 0x00]));
       }
 
       test.should.throw();
@@ -71,7 +71,7 @@ describe("ReadCoilsResponse", function()
 
     it("should read N bytes starting at 2 where N is a byte at 1 as an array of states", function()
     {
-      ReadCoilsResponse.fromBuffer(new Buffer([0x01, 0x02, 0xCB, 0x01, 0xFF])).getStates().should.be.eql([
+      ReadCoilsResponse.fromBuffer(Buffer.from([0x01, 0x02, 0xCB, 0x01, 0xFF])).getStates().should.be.eql([
         1, 1, 0, 1, 0, 0, 1, 1, // 0xCB
         1, 0, 0, 0, 0, 0, 0, 0  // 0x01
       ].map(Boolean));
@@ -109,7 +109,7 @@ describe("ReadCoilsResponse", function()
   {
     it("should return a string", function()
     {
-      new ReadCoilsResponse([0, 1, 1, 0]).toString().should.be.a('string');
+      new ReadCoilsResponse([0, 1, 1, 0]).toString().should.be.a.String();
     });
   });
 

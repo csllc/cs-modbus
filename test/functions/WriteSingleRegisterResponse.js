@@ -71,12 +71,12 @@ describe("WriteSingleRegisterResponse", function()
     {
       function test1()
       {
-        WriteSingleRegisterResponse.fromBuffer(new Buffer([]));
+        WriteSingleRegisterResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        WriteSingleRegisterResponse.fromBuffer(new Buffer([0x06, 0x00, 0x01, 0x00]));
+        WriteSingleRegisterResponse.fromBuffer(Buffer.from([0x06, 0x00, 0x01, 0x00]));
       }
 
       test1.should.throw();
@@ -87,7 +87,7 @@ describe("WriteSingleRegisterResponse", function()
     {
       function test()
       {
-        WriteSingleRegisterResponse.fromBuffer(new Buffer([0x03, 0x00, 0x00, 0x00, 0x01]));
+        WriteSingleRegisterResponse.fromBuffer(Buffer.from([0x03, 0x00, 0x00, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -95,7 +95,7 @@ describe("WriteSingleRegisterResponse", function()
 
     it("should read uint16 at 1 as an address", function()
     {
-      var frame = new Buffer([0x06, 0x12, 0x34, 0x00, 0x01]);
+      var frame = Buffer.from([0x06, 0x12, 0x34, 0x00, 0x01]);
       var req = WriteSingleRegisterResponse.fromBuffer(frame);
 
       req.getAddress().should.be.equal(0x1234);
@@ -103,7 +103,7 @@ describe("WriteSingleRegisterResponse", function()
 
     it("should read uint16 at 3 as a value", function()
     {
-      var frame = new Buffer([0x06, 0x12, 0x34, 0x13, 0x37]);
+      var frame = Buffer.from([0x06, 0x12, 0x34, 0x13, 0x37]);
       var req = WriteSingleRegisterResponse.fromBuffer(frame);
 
       req.getValue().should.be.equal(0x1337);
@@ -137,7 +137,7 @@ describe("WriteSingleRegisterResponse", function()
   {
     it("should return a string", function()
     {
-      new WriteSingleRegisterResponse(0x0001, 0x1337).toString().should.be.a('string');
+      new WriteSingleRegisterResponse(0x0001, 0x1337).toString().should.be.a.String();
     });
   });
 

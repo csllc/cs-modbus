@@ -15,17 +15,17 @@ describe("ReadFileRecordResponse", function()
   {
     function testEmpty()
     {
-      new ReadFileRecordResponse([new Buffer(0)]);
+      new ReadFileRecordResponse([Buffer.alloc(0)]);
     }
 
     function testGreaterThan240()
     {
-      new ReadFileRecordResponse([new Buffer(2), new Buffer(4), new Buffer(242)]);
+      new ReadFileRecordResponse([Buffer.alloc(2), Buffer.alloc(4), Buffer.alloc(242)]);
     }
 
     function testOdd()
     {
-      new ReadFileRecordResponse([new Buffer(2), new Buffer(101)]);
+      new ReadFileRecordResponse([Buffer.alloc(2), Buffer.alloc(101)]);
     }
 
     testEmpty.should.throw();
@@ -37,7 +37,7 @@ describe("ReadFileRecordResponse", function()
   {
     it("should return a valid function code", function()
     {
-      new ReadFileRecordResponse([new Buffer(2)]).getCode().should.be.equal(0x14);
+      new ReadFileRecordResponse([Buffer.alloc(2)]).getCode().should.be.equal(0x14);
     });
   });
 
@@ -45,7 +45,7 @@ describe("ReadFileRecordResponse", function()
   {
     it("should create an instance from the specified options object", function()
     {
-      var subResponses = [new Buffer(2), new Buffer(4)];
+      var subResponses = [Buffer.alloc(2), Buffer.alloc(4)];
 
       var res = ReadFileRecordResponse.fromOptions({
         subResponses: subResponses
@@ -61,12 +61,12 @@ describe("ReadFileRecordResponse", function()
     {
       function test1()
       {
-        ReadFileRecordResponse.fromBuffer(new Buffer([]));
+        ReadFileRecordResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        ReadFileRecordResponse.fromBuffer(new Buffer([0x14, 0x02, 0x01, 0x06]));
+        ReadFileRecordResponse.fromBuffer(Buffer.from([0x14, 0x02, 0x01, 0x06]));
       }
 
       test1.should.throw();
@@ -77,7 +77,7 @@ describe("ReadFileRecordResponse", function()
     {
       function test()
       {
-        ReadFileRecordResponse.fromBuffer(new Buffer([0x01, 0x04, 0x03, 0x06, 0x00, 0x01]));
+        ReadFileRecordResponse.fromBuffer(Buffer.from([0x01, 0x04, 0x03, 0x06, 0x00, 0x01]));
       }
 
       test.should.throw();
@@ -87,7 +87,7 @@ describe("ReadFileRecordResponse", function()
     {
       function test()
       {
-        ReadFileRecordResponse.fromBuffer(new Buffer([
+        ReadFileRecordResponse.fromBuffer(Buffer.from([
           0x14, 0x06,
           0x05, 0xFF, 0x0D, 0xFE, 0x00, 0x20
         ]));
@@ -100,7 +100,7 @@ describe("ReadFileRecordResponse", function()
     {
       function test()
       {
-        ReadFileRecordResponse.fromBuffer(new Buffer([
+        ReadFileRecordResponse.fromBuffer(Buffer.from([
           0x14, 0x0C,
           0x05, 0x06, 0x0D, 0xFE, 0x00, 0x20,
           0x05, 0x06, 0x33, 0xCD
@@ -112,15 +112,15 @@ describe("ReadFileRecordResponse", function()
 
     it("should the sub-responses starting at 3", function()
     {
-      var buf = new Buffer([
+      var buf = Buffer.from([
         0x14, 0x0C,
         0x05, 0x06, 0x0D, 0xFE, 0x00, 0x20,
         0x05, 0x06, 0x33, 0xCD, 0x00, 0x40
       ]);
 
       ReadFileRecordResponse.fromBuffer(buf).getSubResponses().should.be.eql([
-        new Buffer([0x0D, 0xFE, 0x00, 0x20]),
-        new Buffer([0x33, 0xCD, 0x00, 0x40])
+        Buffer.from([0x0D, 0xFE, 0x00, 0x20]),
+        Buffer.from([0x33, 0xCD, 0x00, 0x40])
       ]);
     });
   });
@@ -129,35 +129,35 @@ describe("ReadFileRecordResponse", function()
   {
     it("should return a 6 byte long Buffer for 2 byte sub-response", function()
     {
-      new ReadFileRecordResponse([new Buffer(2)]).toBuffer().length.should.be.equal(6);
+      new ReadFileRecordResponse([Buffer.alloc(2)]).toBuffer().length.should.be.equal(6);
     });
 
     it("should return a 8 byte long Buffer for 4 byte sub-response", function()
     {
-      new ReadFileRecordResponse([new Buffer(4)]).toBuffer().length.should.be.equal(8);
+      new ReadFileRecordResponse([Buffer.alloc(4)]).toBuffer().length.should.be.equal(8);
     });
 
     it("should return a 10 byte long Buffer for two 2 byte sub-responses", function()
     {
-      new ReadFileRecordResponse([new Buffer(2), new Buffer(2)]).toBuffer().length.should.be.equal(10);
+      new ReadFileRecordResponse([Buffer.alloc(2), Buffer.alloc(2)]).toBuffer().length.should.be.equal(10);
     });
 
     it("should write the function code as uint8 at 0", function()
     {
-      new ReadFileRecordResponse([new Buffer(2)]).toBuffer()[0].should.be.equal(0x14);
+      new ReadFileRecordResponse([Buffer.alloc(2)]).toBuffer()[0].should.be.equal(0x14);
     });
 
     it("should write the following byte count as uint8 at 1", function()
     {
-      new ReadFileRecordResponse([new Buffer(2), new Buffer(2)]).toBuffer()[1].should.be.equal(4 * 2);
+      new ReadFileRecordResponse([Buffer.alloc(2), Buffer.alloc(2)]).toBuffer()[1].should.be.equal(4 * 2);
     });
 
     it("should write the specified sub-responses starting at 2", function()
     {
-      var res = new ReadFileRecordResponse([new Buffer([0x01, 0x02]), new Buffer([0x03, 0x04])]);
+      var res = new ReadFileRecordResponse([Buffer.from([0x01, 0x02]), Buffer.from([0x03, 0x04])]);
       var buf = res.toBuffer();
 
-      buf.should.be.eql(new Buffer([0x14, 0x08, 0x03, 0x06, 0x01, 0x02, 0x03, 0x06, 0x03, 0x04]));
+      buf.should.be.eql(Buffer.from([0x14, 0x08, 0x03, 0x06, 0x01, 0x02, 0x03, 0x06, 0x03, 0x04]));
     });
   });
 
@@ -165,7 +165,7 @@ describe("ReadFileRecordResponse", function()
   {
     it("should return a string", function()
     {
-      new ReadFileRecordResponse([new Buffer(6)]).toString().should.be.a('string');
+      new ReadFileRecordResponse([Buffer.alloc(6)]).toString().should.be.a.String();
     });
   });
 
@@ -174,8 +174,8 @@ describe("ReadFileRecordResponse", function()
     it("should return an array of Buffer sub-responses specified in the constructor", function()
     {
       var subResponses = [
-        new Buffer([0x0D, 0xFE, 0x00, 0x20]),
-        new Buffer([0x33, 0xCD, 0x00, 0x40])
+        Buffer.from([0x0D, 0xFE, 0x00, 0x20]),
+        Buffer.from([0x33, 0xCD, 0x00, 0x40])
       ];
 
       new ReadFileRecordResponse(subResponses).getSubResponses().should.be.eql(subResponses);
@@ -187,8 +187,8 @@ describe("ReadFileRecordResponse", function()
     it("should return a total length of the specified sub-responses", function()
     {
       var subResponses = [
-        new Buffer([0x0D, 0xFE, 0x00, 0x20]),
-        new Buffer([0x33, 0xCD, 0x00, 0x40])
+        Buffer.from([0x0D, 0xFE, 0x00, 0x20]),
+        Buffer.from([0x33, 0xCD, 0x00, 0x40])
       ];
 
       new ReadFileRecordResponse(subResponses).getTotalRecordDataLength().should.be.equal(8);

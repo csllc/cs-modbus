@@ -15,12 +15,12 @@ describe("CommandResponse", function()
   {
     function testGreaterThan250()
     {
-      new CommandResponse(0, new Buffer(251));
+      new CommandResponse(0, Buffer.alloc(251));
     }
 
     function testMax()
     {
-      new CommandResponse(0, new Buffer(250));
+      new CommandResponse(0, Buffer.alloc(250));
     }
 
     testGreaterThan250.should.throw();
@@ -31,7 +31,7 @@ describe("CommandResponse", function()
   {
     it("should return a valid function code", function()
     {
-      new CommandResponse(1, new Buffer([0x01, 0x04])).getCode().should.be.equal(0x47);
+      new CommandResponse(1, Buffer.from([0x01, 0x04])).getCode().should.be.equal(0x47);
     });
   });
 
@@ -41,11 +41,11 @@ describe("CommandResponse", function()
     {
       var res = CommandResponse.fromOptions({
         id: 1,
-        values: new Buffer([0xFF, 0xFF])
+        values: Buffer.from([0xFF, 0xFF])
       });
 
       res.getId().should.be.eql(1);
-      res.getValues().should.be.eql(new Buffer([0xFF, 0xFF]));
+      res.getValues().should.be.eql(Buffer.from([0xFF, 0xFF]));
     });
 
   });
@@ -56,12 +56,12 @@ describe("CommandResponse", function()
     {
       function test1()
       {
-        CommandResponse.fromBuffer(new Buffer([]));
+        CommandResponse.fromBuffer(Buffer.from([]));
       }
 
       function test2()
       {
-        CommandResponse.fromBuffer(new Buffer([0x04, 0x00]));
+        CommandResponse.fromBuffer(Buffer.from([0x04, 0x00]));
       }
 
       test1.should.throw();
@@ -72,7 +72,7 @@ describe("CommandResponse", function()
     {
       function test()
       {
-        CommandResponse.fromBuffer(new Buffer([0x01, 0x00]));
+        CommandResponse.fromBuffer(Buffer.from([0x01, 0x00]));
       }
 
       test.should.throw();
@@ -80,8 +80,8 @@ describe("CommandResponse", function()
 
     it("should read N bytes starting at 2 as a values Buffer", function()
     {
-      CommandResponse.fromBuffer(new Buffer([0x43, 0x02, 0x11, 0x22]))
-        .getValues().should.be.eql(new Buffer([0x11, 0x22]));
+      CommandResponse.fromBuffer(Buffer.from([0x47, 0x02, 0x11, 0x22]))
+        .getValues().should.be.eql(Buffer.from([0x11, 0x22]));
     });
   });
 
@@ -89,22 +89,22 @@ describe("CommandResponse", function()
   {
     it("should return a 3 byte long Buffer for one value", function()
     {
-      new CommandResponse(255, new Buffer([0x04])).toBuffer().length.should.be.equal(3);
+      new CommandResponse(255, Buffer.from([0x04])).toBuffer().length.should.be.equal(3);
     });
 
     it("should write the function code as uint8 at 0", function()
     {
-      new CommandResponse(0, new Buffer([0x04, 0x00])).toBuffer()[0].should.be.equal(0x47);
+      new CommandResponse(0, Buffer.from([0x04, 0x00])).toBuffer()[0].should.be.equal(0x47);
     });
 
     it("should write the id as uint8 at 1", function()
     {
-      new CommandResponse(2, new Buffer([0x11, 0x22])).toBuffer()[1].should.be.equal(2);
+      new CommandResponse(2, Buffer.from([0x11, 0x22])).toBuffer()[1].should.be.equal(2);
     });
 
     it("should write the Buffer of values at 2", function()
     {
-      var res = new CommandResponse(0, new Buffer([0x11, 0x22, 0x33]));
+      var res = new CommandResponse(0, Buffer.from([0x11, 0x22, 0x33]));
       var buf = res.toBuffer();
 
       buf[2].should.be.equal(0x11);
@@ -117,7 +117,7 @@ describe("CommandResponse", function()
   {
     it("should return a string", function()
     {
-      new CommandResponse(1, new Buffer([0x11, 0x22, 0x33])).toString().should.be.a('string');
+      new CommandResponse(1, Buffer.from([0x11, 0x22, 0x33])).toString().should.be.a.String();
     });
   });
 
@@ -125,7 +125,7 @@ describe("CommandResponse", function()
   {
     it("should return an a values Buffer specified in the constructor", function()
     {
-      new CommandResponse(1, new Buffer([0x11, 0x22, 0x33])).getValues().should.be.eql(new Buffer([0x11, 0x22, 0x33]));
+      new CommandResponse(1, Buffer.from([0x11, 0x22, 0x33])).getValues().should.be.eql(Buffer.from([0x11, 0x22, 0x33]));
     });
   });
 
@@ -133,7 +133,7 @@ describe("CommandResponse", function()
   {
     it("should return a length of the values Buffer", function()
     {
-      new CommandResponse(1, new Buffer([0x11, 0x22, 0x33])).getCount().should.be.eql(3);
+      new CommandResponse(1, Buffer.from([0x11, 0x22, 0x33])).getCount().should.be.eql(3);
     });
   });
 });
