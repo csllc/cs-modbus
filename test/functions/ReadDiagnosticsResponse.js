@@ -8,7 +8,6 @@ require('should');
 var LIB_DIR = process.env.LIB_FOR_TESTS_DIR || '../../lib';
 
 var ReadDiagnosticsResponse = require(LIB_DIR + '/functions/ReadDiagnosticsRequest');
-var ExceptionResponse = require(LIB_DIR + '/functions/ExceptionResponse');
 
 describe("ReadDiagnosticsResponse", function()
 {
