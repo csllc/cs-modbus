@@ -23,22 +23,22 @@
   ],
   "main": "./lib/index",
   "scripts": {
-    "test": "grunt --force"
+    "test": "grunt"
   },
   "dependencies": {
-    "grunt-mocha": "^1.2.0",
-    "grunt-mocha-test": "^0.13.3",
+
     "h5.buffers": "^0.1.1"
   },
   "devDependencies": {
     "grunt": "^1.5.3",
-    "grunt-browserify": "^5.0.0",
+    "grunt-browserify": "^6.0.0",
     "grunt-cli": "^1.2.0",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-jshint": "^1.1.0",
-    "grunt-env": "^0.4.4",
+    "grunt-contrib-clean": "^2.0.1",
+    "grunt-contrib-jshint": "^3.2.0",
+    "grunt-env": "^1.0.1",
     "grunt-istanbul": "^0.8.0",
-    "should": "^11.2.0",
-    "sinon": "^1.17.7"
+    "grunt-mocha-test": "^0.13.3",
+    "should": "^13.2.3",
+    "sinon": "^14.0.0"
   }
 }

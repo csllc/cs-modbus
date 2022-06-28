@@ -41,8 +41,8 @@ module.exports = function(grunt)
         ignoreLeaks: false,
         globals: ['should'],
         ui: 'bdd',
-        reporter: 'list'
-      },
+        reporter: 'dot'
+      }
     },
     instrument: {
       files: './lib/**/*.js',
@@ -76,11 +76,11 @@ module.exports = function(grunt)
       },
       dev: {
         src: './lib/index.js',
-        dest: './cs-modbus.js'
+        dest: './build/dev/cs-modbus.js'
       },
       dist: {
         src: './lib/index.js',
-        dest: './cs-modbus.js'
+        dest: './build/dist/cs-modbus.js'
       }
     }
   });
@@ -106,14 +106,16 @@ module.exports = function(grunt)
     'makeReport'
   ]);
 
-  grunt.registerTask('browserify', [
-    'browserify:main'
+  grunt.registerTask('distribution', [
+    'browserify'
   ]);
 
   grunt.registerTask('default', [
     'clean',
     'jshint',
     'coverage',
-    'browserify'
+    'distribution'
   ]);
+
 };
+

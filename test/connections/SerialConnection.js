@@ -257,7 +257,7 @@ describe("SerialConnection", function()
         serialPort.isOpen = truthy;
 
         var conn = new SerialConnection(serialPort);
-        conn.isOpen().should.be.ok();
+        conn.isOpen().should.be.ok;
       });
     });
 
@@ -269,7 +269,7 @@ describe("SerialConnection", function()
         serialPort.isOpen = falsy;
 
         var conn = new SerialConnection(serialPort);
-        conn.isOpen().should.be.not.ok();
+        conn.isOpen().should.be.not.ok;
       });
     });
   });
