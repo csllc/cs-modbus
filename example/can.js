@@ -134,7 +134,7 @@ master.once('connected', function()
 
   // send a command to unit 0x80.  t1 is the transaction
   // object that tracks progress of the transaction
-  var t1 = master.command( 0xF0, new Buffer([]), {
+  var t1 = master.command( 0xF0, Buffer.from([]), {
     
     // station ID to send the PDU to
     unit: 0x80,
