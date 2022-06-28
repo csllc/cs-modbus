@@ -35,14 +35,14 @@ module.exports = function(grunt)
         jshintrc: '.jshintrc'
       }
     },
-    simplemocha: {
+    mochaTest: {
       src: './test/**/*.js',
       options: {
         ignoreLeaks: false,
         globals: ['should'],
         ui: 'bdd',
-        reporter: 'dot'
-      }
+        reporter: 'list'
+      },
     },
     instrument: {
       files: './lib/**/*.js',
@@ -88,20 +88,20 @@ module.exports = function(grunt)
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-env');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-simple-mocha');
+  grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-istanbul');
   grunt.loadNpmTasks('grunt-browserify');
 
   grunt.registerTask('test', [
     'env:default',
-    'simplemocha'
+    'mochaTest'
   ]);
 
   grunt.registerTask('coverage', [
     'clean:coverage',
     'env:coverage',
     'instrument',
-    'simplemocha',
+    'mochaTest',
     'storeCoverage',
     'makeReport'
   ]);

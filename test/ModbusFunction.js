@@ -28,7 +28,7 @@ describe("ModbusFunction", function()
     {
       function test()
       {
-        ModbusFunction.fromBuffer(new Buffer(0));
+        ModbusFunction.fromBuffer(Buffer.alloc(0));
       }
 
       test.should.throw();

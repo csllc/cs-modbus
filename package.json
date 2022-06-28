@@ -26,18 +26,18 @@
     "test": "grunt --force"
   },
   "dependencies": {
+    "grunt-mocha": "^1.2.0",
+    "grunt-mocha-test": "^0.13.3",
     "h5.buffers": "^0.1.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "grunt": "^1.0.1",
+    "grunt": "^1.5.3",
     "grunt-browserify": "^5.0.0",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-jshint": "^1.1.0",
     "grunt-env": "^0.4.4",
-    "grunt-istanbul": "^0.7.2",
-    "grunt-simple-mocha": "^0.4.1",
+    "grunt-istanbul": "^0.8.0",
     "should": "^11.2.0",
     "sinon": "^1.17.7"
   }
