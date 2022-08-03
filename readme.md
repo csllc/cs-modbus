@@ -7,7 +7,7 @@ This module is based on h5.modbus.
 Install nodejs for your platform (http://nodejs.org)
 This will make the `node` and `npm` executables available.
 
-## Configuration 
+## Configuration
 Configuration of the MODBUS master happens mainly when the master is created (.createMaster()).
 The options are similar to those supported by h5.modbus, with additional possibilities that make use
 of Control Solutions-specific transports and connections.
@@ -43,7 +43,7 @@ The "master" object controls the behavior of the MODBUS master.  When created, a
   *** _device:_ (required for _generic_ connections).  Set to an instance of the communication object. 
 
 * _suppressTransactionErrors:_ (boolean)  determines whether errors detected at the transaction level will throw exceptions (which must be caught by the application code) or not.
-* _retryOnException:_ (boolean) determines whether the master will retry the message if the slave returns an exception code, or simply fail the message.
+* _retryOnException:_ (boolean or Array) determines whether the master will retry the message (up to the effective maxRetries) if the slave returns an exception code, or simply fail the message.  If an array of exception codes is supplied, the master will retry only if the exception is listed in the array.  For example: `retryOnException:[3,4,5]` will retry only exceptions 3,4,or 5.
 * _maxConcurrentRequests:_ (integer) determines how many transactions may be attempted simultaneously.  This should be '1' for serial connections using RTU or ASCII transport.  A value of '2' provides an efficiency boost for TUNNEL transport over serial.  TCP and UDP connections can support a higher number of simultaneous transactions.  Note: the application may submit multiple requests to the master without concern for this maximum; additional requests will simply be queued until the connection is able to accept them.
 * _defaultUnit:_ (integer): the default MODBUS unit identifier to transmit messages to. Can be overridden on a message-by-message basis.
 * _defaultMaxRetries:_ (integer) the number of times to retry an unsuccessful transaction before failing it.  Can be overridden on a message-by-message basis
